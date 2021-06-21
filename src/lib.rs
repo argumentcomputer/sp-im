@@ -338,8 +338,6 @@
 #[macro_use]
 extern crate pretty_assertions;
 
-extern crate alloc;
-
 mod config;
 mod nodes;
 mod sort;
