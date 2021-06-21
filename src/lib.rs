@@ -338,6 +338,8 @@
 #[macro_use]
 extern crate pretty_assertions;
 
+extern crate alloc;
+
 mod config;
 mod nodes;
 mod sort;
@@ -348,15 +350,17 @@ mod util;
 
 #[macro_use]
 mod ord;
-pub use crate::ord::{
-  map as ordmap,
-  set as ordset,
-};
+pub use crate::ord::{map as ordmap, set as ordset};
 
 #[macro_use]
 pub mod vector;
 
 pub mod iter;
+
+#[macro_use]
+pub mod conslist;
+
+pub mod shared;
 
 #[cfg(any(test, feature = "serde"))]
 #[doc(hidden)]
@@ -375,10 +379,7 @@ mod fakepool;
 
 #[doc(inline)]
 pub use crate::vector::Vector;
-pub use crate::{
-  ordmap::OrdMap,
-  ordset::OrdSet,
-};
+pub use crate::{ordmap::OrdMap, ordset::OrdSet};
 
 #[cfg(test)]
 mod test;
@@ -456,27 +457,26 @@ macro_rules! get_in {
 
 #[cfg(test)]
 mod lib_test {
-  #[test]
-  fn update_in() {
-    let vector = vector![1, 2, 3, 4, 5];
-    assert_eq!(vector![1, 2, 23, 4, 5], update_in!(vector, 2, 23));
-    let ordmap = ordmap![1 => 1, 2 => 2, 3 => 3];
-    assert_eq!(ordmap![1 => 1, 2 => 23, 3 => 3], update_in!(ordmap, 2, 23));
+    #[test]
+    fn update_in() {
+        let vector = vector![1, 2, 3, 4, 5];
+        assert_eq!(vector![1, 2, 23, 4, 5], update_in!(vector, 2, 23));
+        let ordmap = ordmap![1 => 1, 2 => 2, 3 => 3];
+        assert_eq!(ordmap![1 => 1, 2 => 23, 3 => 3], update_in!(ordmap, 2, 23));
 
-    let vecs = vector![vector![1, 2, 3], vector![4, 5, 6], vector![7, 8, 9]];
-    let vecs_target =
-      vector![vector![1, 2, 3], vector![4, 5, 23], vector![7, 8, 9]];
-    assert_eq!(vecs_target, update_in!(vecs, 1 => 2, 23));
-  }
+        let vecs = vector![vector![1, 2, 3], vector![4, 5, 6], vector![7, 8, 9]];
+        let vecs_target = vector![vector![1, 2, 3], vector![4, 5, 23], vector![7, 8, 9]];
+        assert_eq!(vecs_target, update_in!(vecs, 1 => 2, 23));
+    }
 
-  #[test]
-  fn get_in() {
-    let vector = vector![1, 2, 3, 4, 5];
-    assert_eq!(Some(&3), get_in!(vector, 2));
-    let ordmap = ordmap![1 => 1, 2 => 2, 3 => 3];
-    assert_eq!(Some(&2), get_in!(ordmap, &2));
+    #[test]
+    fn get_in() {
+        let vector = vector![1, 2, 3, 4, 5];
+        assert_eq!(Some(&3), get_in!(vector, 2));
+        let ordmap = ordmap![1 => 1, 2 => 2, 3 => 3];
+        assert_eq!(Some(&2), get_in!(ordmap, &2));
 
-    let vecs = vector![vector![1, 2, 3], vector![4, 5, 6], vector![7, 8, 9]];
-    assert_eq!(Some(&6), get_in!(vecs, 1 => 2));
-  }
+        let vecs = vector![vector![1, 2, 3], vector![4, 5, 6], vector![7, 8, 9]];
+        assert_eq!(Some(&6), get_in!(vecs, 1 => 2));
+    }
 }
