@@ -2,12 +2,24 @@
 //!
 //! These are only available when using the `proptest` feature flag.
 
-use crate::{HashMap, HashSet, OrdMap, OrdSet, Vector};
-use ::proptest::collection::vec;
-use ::proptest::strategy::{BoxedStrategy, Strategy, ValueTree};
-use std::hash::Hash;
-use std::iter::FromIterator;
-use std::ops::Range;
+use crate::{
+  OrdMap,
+  OrdSet,
+  Vector,
+};
+use ::proptest::{
+  collection::vec,
+  strategy::{
+    BoxedStrategy,
+    Strategy,
+    ValueTree,
+  },
+};
+use std::{
+  hash::Hash,
+  iter::FromIterator,
+  ops::Range,
+};
 
 /// A strategy for generating a [`Vector`][Vector] of a certain size.
 ///
@@ -26,13 +38,13 @@ use std::ops::Range;
 ///
 /// [Vector]: ../struct.Vector.html
 pub fn vector<A: Strategy + 'static>(
-    element: A,
-    size: Range<usize>,
+  element: A,
+  size: Range<usize>,
 ) -> BoxedStrategy<Vector<<A::Tree as ValueTree>::Value>>
 where
-    <A::Tree as ValueTree>::Value: Clone,
+  <A::Tree as ValueTree>::Value: Clone,
 {
-    vec(element, size).prop_map(Vector::from_iter).boxed()
+  vec(element, size).prop_map(Vector::from_iter).boxed()
 }
 
 /// A strategy for an [`OrdMap`][OrdMap] of a given size.
@@ -52,20 +64,22 @@ where
 ///
 /// [OrdMap]: ../struct.OrdMap.html
 pub fn ord_map<K: Strategy + 'static, V: Strategy + 'static>(
-    key: K,
-    value: V,
-    size: Range<usize>,
-) -> BoxedStrategy<OrdMap<<K::Tree as ValueTree>::Value, <V::Tree as ValueTree>::Value>>
+  key: K,
+  value: V,
+  size: Range<usize>,
+) -> BoxedStrategy<
+  OrdMap<<K::Tree as ValueTree>::Value, <V::Tree as ValueTree>::Value>,
+>
 where
-    <K::Tree as ValueTree>::Value: Ord + Clone,
-    <V::Tree as ValueTree>::Value: Clone,
+  <K::Tree as ValueTree>::Value: Ord + Clone,
+  <V::Tree as ValueTree>::Value: Clone,
 {
-    ::proptest::collection::vec((key, value), size.clone())
-        .prop_map(OrdMap::from)
-        .prop_filter("OrdMap minimum size".to_owned(), move |m| {
-            m.len() >= size.start
-        })
-        .boxed()
+  ::proptest::collection::vec((key, value), size.clone())
+    .prop_map(OrdMap::from)
+    .prop_filter("OrdMap minimum size".to_owned(), move |m| {
+      m.len() >= size.start
+    })
+    .boxed()
 }
 
 /// A strategy for an [`OrdSet`][OrdSet] of a given size.
@@ -85,18 +99,18 @@ where
 ///
 /// [OrdSet]: ../struct.OrdSet.html
 pub fn ord_set<A: Strategy + 'static>(
-    element: A,
-    size: Range<usize>,
+  element: A,
+  size: Range<usize>,
 ) -> BoxedStrategy<OrdSet<<A::Tree as ValueTree>::Value>>
 where
-    <A::Tree as ValueTree>::Value: Ord + Clone,
+  <A::Tree as ValueTree>::Value: Ord + Clone,
 {
-    ::proptest::collection::vec(element, size.clone())
-        .prop_map(OrdSet::from)
-        .prop_filter("OrdSet minimum size".to_owned(), move |s| {
-            s.len() >= size.start
-        })
-        .boxed()
+  ::proptest::collection::vec(element, size.clone())
+    .prop_map(OrdSet::from)
+    .prop_filter("OrdSet minimum size".to_owned(), move |s| {
+      s.len() >= size.start
+    })
+    .boxed()
 }
 
 /// A strategy for a [`HashMap`][HashMap] of a given size.
@@ -116,20 +130,20 @@ where
 ///
 /// [HashMap]: ../struct.HashMap.html
 pub fn hash_map<K: Strategy + 'static, V: Strategy + 'static>(
-    key: K,
-    value: V,
-    size: Range<usize>,
-) -> BoxedStrategy<HashMap<<K::Tree as ValueTree>::Value, <V::Tree as ValueTree>::Value>>
+  key: K,
+  value: V,
+  size: Range<usize>,
+) -> BoxedStrategy<
+  HashMap<<K::Tree as ValueTree>::Value, <V::Tree as ValueTree>::Value>,
+>
 where
-    <K::Tree as ValueTree>::Value: Hash + Eq + Clone,
-    <V::Tree as ValueTree>::Value: Clone,
+  <K::Tree as ValueTree>::Value: Hash + Eq + Clone,
+  <V::Tree as ValueTree>::Value: Clone,
 {
-    ::proptest::collection::vec((key, value), size.clone())
-        .prop_map(HashMap::from)
-        .prop_filter("Map minimum size".to_owned(), move |m| {
-            m.len() >= size.start
-        })
-        .boxed()
+  ::proptest::collection::vec((key, value), size.clone())
+    .prop_map(HashMap::from)
+    .prop_filter("Map minimum size".to_owned(), move |m| m.len() >= size.start)
+    .boxed()
 }
 
 /// A strategy for a [`HashSet`][HashSet] of a given size.
@@ -149,16 +163,16 @@ where
 ///
 /// [HashSet]: ../struct.HashSet.html
 pub fn hash_set<A: Strategy + 'static>(
-    element: A,
-    size: Range<usize>,
+  element: A,
+  size: Range<usize>,
 ) -> BoxedStrategy<HashSet<<A::Tree as ValueTree>::Value>>
 where
-    <A::Tree as ValueTree>::Value: Hash + Eq + Clone,
+  <A::Tree as ValueTree>::Value: Hash + Eq + Clone,
 {
-    ::proptest::collection::vec(element, size.clone())
-        .prop_map(HashSet::from)
-        .prop_filter("HashSet minimum size".to_owned(), move |s| {
-            s.len() >= size.start
-        })
-        .boxed()
+  ::proptest::collection::vec(element, size.clone())
+    .prop_map(HashSet::from)
+    .prop_filter("HashSet minimum size".to_owned(), move |s| {
+      s.len() >= size.start
+    })
+    .boxed()
 }

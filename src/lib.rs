@@ -18,8 +18,6 @@
 //! Briefly, the following data structures are provided:
 //!
 //! * [Vectors][vector::Vector] based on [RRB trees][rrb-tree]
-//! * [Hash maps][hashmap::HashMap]/[sets][hashset::HashSet] based on [hash
-//!   array mapped tries][hamt]
 //! * [Ordered maps][ordmap::OrdMap]/[sets][ordset::OrdSet] based on
 //!   [B-trees][b-tree]
 //!
@@ -85,14 +83,11 @@
 //! [`Vector`][vector::Vector] will actually be equivalent to
 //! [Vec][std::vec::Vec] until it grows past the size of a single chunk.
 //!
-//! The maps - [`HashMap`][hashmap::HashMap] and
-//! [`OrdMap`][ordmap::OrdMap] - generally perform similarly to their
+//! The map [`OrdMap`][ordmap::OrdMap] - generally performs similarly its
 //! equivalents in the standard library, but tend to run a bit slower
-//! on the basic operations ([`HashMap`][hashmap::HashMap] is almost
-//! neck and neck with its counterpart, while
-//! [`OrdMap`][ordmap::OrdMap] currently tends to run 2-3x slower). On
-//! the other hand, they offer the cheap copy and structural sharing
-//! between copies that you'd expect from immutable data structures.
+//! on the basic operations ([`OrdMap`][ordmap::OrdMap] currently tends to run
+//! 2-3x slower). On the other hand, they offer the cheap copy and structural
+//! sharing between copies that you'd expect from immutable data structures.
 //!
 //! In conclusion, the aim of this library is to provide a safe
 //! default choice for the most common kinds of data structures,
@@ -219,9 +214,11 @@
 //! performance characteristics: it's pretty good at everything, even
 //! if there's always another kind of list that's better at something.
 //!
-//! | Type | Algorithm | Constraints | Order | Push | Pop | Split | Append | Lookup |
-//! | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-//! | [`Vector<A>`][vector::Vector] | [RRB tree][rrb-tree] | [`Clone`][std::clone::Clone] | insertion | O(1)\* | O(1)\* | O(log n) | O(log n) | O(log n) |
+//! | Type | Algorithm | Constraints | Order | Push | Pop | Split | Append |
+//! Lookup | | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+//! | [`Vector<A>`][vector::Vector] | [RRB tree][rrb-tree] |
+//! [`Clone`][std::clone::Clone] | insertion | O(1)\* | O(1)\* | O(log n) |
+//! O(log n) | O(log n) |
 //!
 //! ### Maps
 //!
@@ -233,8 +230,9 @@
 //!
 //! | Type | Algorithm | Key Constraints | Order | Insert | Remove | Lookup |
 //! | --- | --- | --- | --- | --- | --- | --- |
-//! | [`HashMap<K, V>`][hashmap::HashMap] | [HAMT][hamt] | [`Clone`][std::clone::Clone] + [`Hash`][std::hash::Hash] + [`Eq`][std::cmp::Eq] | undefined | O(log n) | O(log n) | O(log n) |
-//! | [`OrdMap<K, V>`][ordmap::OrdMap] | [B-tree][b-tree] | [`Clone`][std::clone::Clone] + [`Ord`][std::cmp::Ord] | sorted | O(log n) | O(log n) | O(log n) |
+//! | [`OrdMap<K, V>`][ordmap::OrdMap] | [B-tree][b-tree] |
+//! [`Clone`][std::clone::Clone] + [`Ord`][std::cmp::Ord] | sorted | O(log n) |
+//! O(log n) | O(log n) |
 //!
 //! ### Sets
 //!
@@ -244,8 +242,9 @@
 //!
 //! | Type | Algorithm | Constraints | Order | Insert | Remove | Lookup |
 //! | --- | --- | --- | --- | --- | --- | --- |
-//! | [`HashSet<A>`][hashset::HashSet] | [HAMT][hamt] | [`Clone`][std::clone::Clone] + [`Hash`][std::hash::Hash] + [`Eq`][std::cmp::Eq] | undefined | O(log n) | O(log n) | O(log n) |
-//! | [`OrdSet<A>`][ordset::OrdSet] | [B-tree][b-tree] | [`Clone`][std::clone::Clone] + [`Ord`][std::cmp::Ord] | sorted | O(log n) | O(log n) | O(log n) |
+//! | [`OrdSet<A>`][ordset::OrdSet] | [B-tree][b-tree] |
+//! [`Clone`][std::clone::Clone] + [`Ord`][std::cmp::Ord] | sorted | O(log n) |
+//! O(log n) | O(log n) |
 //!
 //! ## In-place Mutation
 //!
@@ -303,7 +302,6 @@
 //!
 //! | Feature | Description |
 //! | ------- | ----------- |
-//! | [`pool`](https://crates.io/crates/refpool) | Constructors and pool types for [`refpool`](https://crates.io/crates/refpool) memory pools (only available in `im-rc`) |
 //! | [`proptest`](https://crates.io/crates/proptest) | Strategies for all `im` datatypes under a `proptest` namespace, eg. `im::vector::proptest::vector()` |
 //! | [`quickcheck`](https://crates.io/crates/quickcheck) | [`quickcheck::Arbitrary`](https://docs.rs/quickcheck/latest/quickcheck/trait.Arbitrary.html) implementations for all `im` datatypes (not available in `im-rc`) |
 //! | [`rayon`](https://crates.io/crates/rayon) | parallel iterator implementations for [`Vector`][vector::Vector] (not available in `im-rc`) |
@@ -321,17 +319,13 @@
 //! [std::clone::Clone]: https://doc.rust-lang.org/std/clone/trait.Clone.html
 //! [std::clone::Clone::clone]: https://doc.rust-lang.org/std/clone/trait.Clone.html#tymethod.clone
 //! [std::marker::Copy]: https://doc.rust-lang.org/std/marker/trait.Copy.html
-//! [std::hash::Hash]: https://doc.rust-lang.org/std/hash/trait.Hash.html
 //! [std::marker::Send]: https://doc.rust-lang.org/std/marker/trait.Send.html
 //! [std::marker::Sync]: https://doc.rust-lang.org/std/marker/trait.Sync.html
-//! [hashmap::HashMap]: ./struct.HashMap.html
-//! [hashset::HashSet]: ./struct.HashSet.html
 //! [ordmap::OrdMap]: ./struct.OrdMap.html
 //! [ordset::OrdSet]: ./struct.OrdSet.html
 //! [vector::Vector]: ./struct.Vector.html
 //! [vector::Vector::push_back]: ./vector/enum.Vector.html#method.push_back
 //! [rrb-tree]: https://infoscience.epfl.ch/record/213452/files/rrbvector.pdf
-//! [hamt]: https://en.wikipedia.org/wiki/Hash_array_mapped_trie
 //! [b-tree]: https://en.wikipedia.org/wiki/B-tree
 //! [cons-list]: https://en.wikipedia.org/wiki/Cons#Lists
 
@@ -354,13 +348,10 @@ mod util;
 
 #[macro_use]
 mod ord;
-pub use crate::ord::map as ordmap;
-pub use crate::ord::set as ordset;
-
-#[macro_use]
-mod hash;
-pub use crate::hash::map as hashmap;
-pub use crate::hash::set as hashset;
+pub use crate::ord::{
+  map as ordmap,
+  set as ordset,
+};
 
 #[macro_use]
 pub mod vector;
@@ -387,15 +378,16 @@ mod fakepool;
 
 #[cfg(all(threadsafe, feature = "pool"))]
 compile_error!(
-    "The `pool` feature is not threadsafe but you've enabled it on a threadsafe version of `im`."
+  "The `pool` feature is not threadsafe but you've enabled it on a threadsafe \
+   version of `im`."
 );
 
-pub use crate::hashmap::HashMap;
-pub use crate::hashset::HashSet;
-pub use crate::ordmap::OrdMap;
-pub use crate::ordset::OrdSet;
 #[doc(inline)]
 pub use crate::vector::Vector;
+pub use crate::{
+  ordmap::OrdMap,
+  ordset::OrdSet,
+};
 
 #[cfg(test)]
 mod test;
@@ -405,9 +397,9 @@ mod tests;
 
 /// Update a value inside multiple levels of data structures.
 ///
-/// This macro takes a [`Vector`][Vector], [`OrdMap`][OrdMap] or [`HashMap`][HashMap],
-/// a key or a series of keys, and a value, and returns the data structure with the
-/// new value at the location described by the keys.
+/// This macro takes a [`Vector`][Vector], [`OrdMap`][OrdMap] or, a key or a
+/// series of keys, and a value, and returns the data structure with the new
+/// value at the location described by the keys.
 ///
 /// If one of the keys in the path doesn't exist, the macro will panic.
 ///
@@ -426,7 +418,6 @@ mod tests;
 /// ```
 ///
 /// [Vector]: ../vector/enum.Vector.html
-/// [HashMap]: ../hashmap/struct.HashMap.html
 /// [OrdMap]: ../ordmap/struct.OrdMap.html
 #[macro_export]
 macro_rules! update_in {
@@ -442,9 +433,9 @@ macro_rules! update_in {
 
 /// Get a value inside multiple levels of data structures.
 ///
-/// This macro takes a [`Vector`][Vector], [`OrdMap`][OrdMap] or [`HashMap`][HashMap],
-/// along with a key or a series of keys, and returns the value at the location inside
-/// the data structure described by the key sequence, or `None` if any of the keys didn't
+/// This macro takes a [`Vector`][Vector], [`OrdMap`][OrdMap] along with a key
+/// or a series of keys, and returns the value at the location inside the data
+/// structure described by the key sequence, or `None` if any of the keys didn't
 /// exist.
 ///
 /// # Examples
@@ -460,7 +451,6 @@ macro_rules! update_in {
 /// ```
 ///
 /// [Vector]: ../vector/enum.Vector.html
-/// [HashMap]: ../hashmap/struct.HashMap.html
 /// [OrdMap]: ../ordmap/struct.OrdMap.html
 #[macro_export]
 macro_rules! get_in {
@@ -475,33 +465,31 @@ macro_rules! get_in {
 
 #[cfg(test)]
 mod lib_test {
-    #[test]
-    fn update_in() {
-        let vector = vector![1, 2, 3, 4, 5];
-        assert_eq!(vector![1, 2, 23, 4, 5], update_in!(vector, 2, 23));
-        let hashmap = hashmap![1 => 1, 2 => 2, 3 => 3];
-        assert_eq!(
-            hashmap![1 => 1, 2 => 23, 3 => 3],
-            update_in!(hashmap, 2, 23)
-        );
-        let ordmap = ordmap![1 => 1, 2 => 2, 3 => 3];
-        assert_eq!(ordmap![1 => 1, 2 => 23, 3 => 3], update_in!(ordmap, 2, 23));
+  #[test]
+  fn update_in() {
+    let vector = vector![1, 2, 3, 4, 5];
+    assert_eq!(vector![1, 2, 23, 4, 5], update_in!(vector, 2, 23));
+    let hashmap = hashmap![1 => 1, 2 => 2, 3 => 3];
+    assert_eq!(hashmap![1 => 1, 2 => 23, 3 => 3], update_in!(hashmap, 2, 23));
+    let ordmap = ordmap![1 => 1, 2 => 2, 3 => 3];
+    assert_eq!(ordmap![1 => 1, 2 => 23, 3 => 3], update_in!(ordmap, 2, 23));
 
-        let vecs = vector![vector![1, 2, 3], vector![4, 5, 6], vector![7, 8, 9]];
-        let vecs_target = vector![vector![1, 2, 3], vector![4, 5, 23], vector![7, 8, 9]];
-        assert_eq!(vecs_target, update_in!(vecs, 1 => 2, 23));
-    }
+    let vecs = vector![vector![1, 2, 3], vector![4, 5, 6], vector![7, 8, 9]];
+    let vecs_target =
+      vector![vector![1, 2, 3], vector![4, 5, 23], vector![7, 8, 9]];
+    assert_eq!(vecs_target, update_in!(vecs, 1 => 2, 23));
+  }
 
-    #[test]
-    fn get_in() {
-        let vector = vector![1, 2, 3, 4, 5];
-        assert_eq!(Some(&3), get_in!(vector, 2));
-        let hashmap = hashmap![1 => 1, 2 => 2, 3 => 3];
-        assert_eq!(Some(&2), get_in!(hashmap, &2));
-        let ordmap = ordmap![1 => 1, 2 => 2, 3 => 3];
-        assert_eq!(Some(&2), get_in!(ordmap, &2));
+  #[test]
+  fn get_in() {
+    let vector = vector![1, 2, 3, 4, 5];
+    assert_eq!(Some(&3), get_in!(vector, 2));
+    let hashmap = hashmap![1 => 1, 2 => 2, 3 => 3];
+    assert_eq!(Some(&2), get_in!(hashmap, &2));
+    let ordmap = ordmap![1 => 1, 2 => 2, 3 => 3];
+    assert_eq!(Some(&2), get_in!(ordmap, &2));
 
-        let vecs = vector![vector![1, 2, 3], vector![4, 5, 6], vector![7, 8, 9]];
-        assert_eq!(Some(&6), get_in!(vecs, 1 => 2));
-    }
+    let vecs = vector![vector![1, 2, 3], vector![4, 5, 6], vector![7, 8, 9]];
+    assert_eq!(Some(&6), get_in!(vecs, 1 => 2));
+  }
 }

@@ -1,33 +1,20 @@
 [package]
-name = "im"
-version = "15.0.0"
-authors = ["Bodil Stokke <bodil@bodil.org>"]
+name = "sp-im"
+version = "0.0.1"
+authors = ["John Burnham <john@yatima.io>"]
 edition = "2018"
-license = "MPL-2.0+"
+license = "MIT"
 description = "Immutable collection datatypes"
-repository = "https://github.com/bodil/im-rs"
-documentation = "http://immutable.rs/"
-homepage = "http://immutable.rs/"
+repository = "https://github.com/yatima-inc/sp-im"
 readme = "./README.md"
 categories = ["data-structures"]
-keywords = ["immutable", "persistent", "hamt", "b-tree", "rrb-tree"]
-build = "./build.rs"
-exclude = [
-    "dist/**",
-    "rc/**",
-    "release.toml",
-    "Makefile.toml",
-    "proptest-regressions/**"
-]
+keywords = ["immutable", "persistent", "no_std", "b-tree", "rrb-tree"]
 
 [package.metadata.docs.rs]
 all-features = true
 
 [lib]
 path = "./src/lib.rs"
-
-[badges]
-travis-ci = { repository = "bodil/im-rs" }
 
 [build-dependencies]
 version_check = "0.9"
