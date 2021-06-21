@@ -1063,22 +1063,9 @@ impl<'a, A: Ord + Clone> From<&'a collections::BTreeSet<A>> for OrdSet<A> {
   }
 }
 
-// Proptest
-#[cfg(any(test, feature = "proptest"))]
-#[doc(hidden)]
-pub mod proptest {
-  #[deprecated(
-    since = "14.3.0",
-    note = "proptest strategies have moved to im::proptest"
-  )]
-  pub use crate::proptest::ord_set;
-}
-
 #[cfg(test)]
 mod test {
   use super::*;
-  use crate::proptest::*;
-  use ::proptest::proptest;
 
   #[test]
   fn match_strings_with_string_slices() {
@@ -1112,27 +1099,5 @@ mod test {
     assert_eq!(vec![1, 2, 3], range);
     let range: Vec<i32> = set.range(..=3).rev().cloned().collect();
     assert_eq!(vec![3, 2, 1], range);
-  }
-
-  proptest! {
-      #[test]
-      fn proptest_a_set(ref s in ord_set(".*", 10..100)) {
-          assert!(s.len() < 100);
-          assert!(s.len() >= 10);
-      }
-
-      #[test]
-      fn long_ranged_iter(max in 1..1000) {
-          let range = 0..max;
-          let expected: Vec<i32> = range.clone().collect();
-          let set: OrdSet<i32> = OrdSet::from_iter(range.clone());
-          let result: Vec<i32> = set.range(..).cloned().collect();
-          assert_eq!(expected, result);
-
-          let expected: Vec<i32> = range.clone().rev().collect();
-          let set: OrdSet<i32> = OrdSet::from_iter(range);
-          let result: Vec<i32> = set.range(..).rev().cloned().collect();
-          assert_eq!(expected, result);
-      }
   }
 }
