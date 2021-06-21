@@ -16,10 +16,10 @@
 //! [1]: https://en.wikipedia.org/wiki/B-tree
 //! [std::cmp::Ord]: https://doc.rust-lang.org/std/cmp/trait.Ord.html
 
-use std::{
+use sp_std::{
   borrow::Borrow,
   cmp::Ordering,
-  collections,
+  collections::btree_map,
   fmt::{
     Debug,
     Error,
@@ -1965,43 +1965,17 @@ where
   }
 }
 
-impl<K: Ord, V, RK: Eq + Hash, RV> From<collections::HashMap<RK, RV>>
-  for OrdMap<K, V>
+impl<K: Ord, V, RK, RV> From<btree_map::BTreeMap<RK, RV>> for OrdMap<K, V>
 where
   K: Ord + Clone + From<RK>,
   V: Clone + From<RV>,
 {
-  fn from(m: collections::HashMap<RK, RV>) -> OrdMap<K, V> {
+  fn from(m: btree_map::BTreeMap<RK, RV>) -> OrdMap<K, V> {
     m.into_iter().collect()
   }
 }
 
-impl<'a, K, V, OK, OV, RK, RV> From<&'a collections::HashMap<RK, RV>>
-  for OrdMap<K, V>
-where
-  K: Ord + Clone + From<OK>,
-  V: Clone + From<OV>,
-  OK: Borrow<RK>,
-  OV: Borrow<RV>,
-  RK: Hash + Eq + ToOwned<Owned = OK>,
-  RV: ToOwned<Owned = OV>,
-{
-  fn from(m: &'a collections::HashMap<RK, RV>) -> OrdMap<K, V> {
-    m.iter().map(|(k, v)| (k.to_owned(), v.to_owned())).collect()
-  }
-}
-
-impl<K: Ord, V, RK, RV> From<collections::BTreeMap<RK, RV>> for OrdMap<K, V>
-where
-  K: Ord + Clone + From<RK>,
-  V: Clone + From<RV>,
-{
-  fn from(m: collections::BTreeMap<RK, RV>) -> OrdMap<K, V> {
-    m.into_iter().collect()
-  }
-}
-
-impl<'a, K: Ord, V, RK, RV, OK, OV> From<&'a collections::BTreeMap<RK, RV>>
+impl<'a, K: Ord, V, RK, RV, OK, OV> From<&'a btree_map::BTreeMap<RK, RV>>
   for OrdMap<K, V>
 where
   K: Ord + Clone + From<OK>,
@@ -2011,20 +1985,9 @@ where
   RK: Ord + ToOwned<Owned = OK>,
   RV: ToOwned<Owned = OV>,
 {
-  fn from(m: &'a collections::BTreeMap<RK, RV>) -> OrdMap<K, V> {
+  fn from(m: &'a btree_map::BTreeMap<RK, RV>) -> OrdMap<K, V> {
     m.iter().map(|(k, v)| (k.to_owned(), v.to_owned())).collect()
   }
-}
-
-// Proptest
-#[cfg(any(test, feature = "proptest"))]
-#[doc(hidden)]
-pub mod proptest {
-  #[deprecated(
-    since = "14.3.0",
-    note = "proptest strategies have moved to im::proptest"
-  )]
-  pub use crate::proptest::ord_map;
 }
 
 // Tests

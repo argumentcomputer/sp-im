@@ -4,66 +4,30 @@
 
 pub(crate) use self::lock::Lock;
 
-#[cfg(threadsafe)]
 mod lock {
-    use std::sync::{Arc, Mutex, MutexGuard};
+  use std::sync::{
+    Arc,
+    Mutex,
+    MutexGuard,
+  };
 
-    /// Thread safe lock: just wraps a `Mutex`.
-    pub(crate) struct Lock<A> {
-        lock: Arc<Mutex<A>>,
+  /// Thread safe lock: just wraps a `Mutex`.
+  pub(crate) struct Lock<A> {
+    lock: Arc<Mutex<A>>,
+  }
+
+  impl<A> Lock<A> {
+    pub(crate) fn new(value: A) -> Self {
+      Lock { lock: Arc::new(Mutex::new(value)) }
     }
 
-    impl<A> Lock<A> {
-        pub(crate) fn new(value: A) -> Self {
-            Lock {
-                lock: Arc::new(Mutex::new(value)),
-            }
-        }
-
-        #[inline]
-        pub(crate) fn lock(&mut self) -> Option<MutexGuard<'_, A>> {
-            self.lock.lock().ok()
-        }
+    #[inline]
+    pub(crate) fn lock(&mut self) -> Option<MutexGuard<'_, A>> {
+      self.lock.lock().ok()
     }
+  }
 
-    impl<A> Clone for Lock<A> {
-        fn clone(&self) -> Self {
-            Lock {
-                lock: self.lock.clone(),
-            }
-        }
-    }
-}
-
-#[cfg(not(threadsafe))]
-mod lock {
-    use std::cell::{RefCell, RefMut};
-    use std::rc::Rc;
-
-    /// Single threaded lock: a `RefCell` so we should safely panic if somehow
-    /// trying to access the stored data twice from the same thread.
-    pub(crate) struct Lock<A> {
-        lock: Rc<RefCell<A>>,
-    }
-
-    impl<A> Lock<A> {
-        pub(crate) fn new(value: A) -> Self {
-            Lock {
-                lock: Rc::new(RefCell::new(value)),
-            }
-        }
-
-        #[inline]
-        pub(crate) fn lock(&mut self) -> Option<RefMut<'_, A>> {
-            self.lock.try_borrow_mut().ok()
-        }
-    }
-
-    impl<A> Clone for Lock<A> {
-        fn clone(&self) -> Self {
-            Lock {
-                lock: self.lock.clone(),
-            }
-        }
-    }
+  impl<A> Clone for Lock<A> {
+    fn clone(&self) -> Self { Lock { lock: self.lock.clone() } }
+  }
 }

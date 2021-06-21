@@ -17,7 +17,7 @@ use serde::{
     Serializer,
   },
 };
-use std::{
+use sp_std::{
   fmt,
   marker::PhantomData,
   ops::Deref,

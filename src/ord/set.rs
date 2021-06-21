@@ -17,10 +17,10 @@
 //! [hashset::HashSet]: ../hashset/struct.HashSet.html
 //! [std::cmp::Ord]: https://doc.rust-lang.org/std/cmp/trait.Ord.html
 
-use std::{
+use sp_std::{
   borrow::Borrow,
   cmp::Ordering,
-  collections,
+  collections::btree_set,
   fmt::{
     Debug,
     Error,
@@ -1037,28 +1037,14 @@ impl<'a, A: Ord + Clone> From<&'a Vec<A>> for OrdSet<A> {
   fn from(vec: &Vec<A>) -> Self { vec.iter().cloned().collect() }
 }
 
-impl<A: Eq + Hash + Ord + Clone> From<collections::HashSet<A>> for OrdSet<A> {
-  fn from(hash_set: collections::HashSet<A>) -> Self {
-    hash_set.into_iter().collect()
-  }
-}
-
-impl<'a, A: Eq + Hash + Ord + Clone> From<&'a collections::HashSet<A>>
-  for OrdSet<A>
-{
-  fn from(hash_set: &collections::HashSet<A>) -> Self {
-    hash_set.iter().cloned().collect()
-  }
-}
-
-impl<A: Ord + Clone> From<collections::BTreeSet<A>> for OrdSet<A> {
-  fn from(btree_set: collections::BTreeSet<A>) -> Self {
+impl<A: Ord + Clone> From<btree_set::BTreeSet<A>> for OrdSet<A> {
+  fn from(btree_set: btree_set::BTreeSet<A>) -> Self {
     btree_set.into_iter().collect()
   }
 }
 
-impl<'a, A: Ord + Clone> From<&'a collections::BTreeSet<A>> for OrdSet<A> {
-  fn from(btree_set: &collections::BTreeSet<A>) -> Self {
+impl<'a, A: Ord + Clone> From<&'a btree_set::BTreeSet<A>> for OrdSet<A> {
+  fn from(btree_set: &btree_set::BTreeSet<A>) -> Self {
     btree_set.iter().cloned().collect()
   }
 }

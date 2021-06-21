@@ -43,7 +43,7 @@
 //! [Vec]: https://doc.rust-lang.org/std/vec/struct.Vec.html
 //! [VecDeque]: https://doc.rust-lang.org/std/collections/struct.VecDeque.html
 
-use std::{
+use sp_std::{
   borrow::Borrow,
   cmp::Ordering,
   fmt::{

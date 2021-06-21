@@ -17,7 +17,7 @@
 /// # #[macro_use] extern crate im;
 /// # use im::iter::unfold;
 /// # use im::vector::Vector;
-/// # use std::iter::FromIterator;
+/// # use sp_std::iter::FromIterator;
 /// // Create an infinite stream of numbers, starting at 0.
 /// let mut it = unfold(0, |i| Some((i, i + 1)));
 ///
@@ -29,14 +29,12 @@
 /// [std::option::Option]: https://doc.rust-lang.org/std/option/enum.Option.html
 /// [std::option::Option::None]: https://doc.rust-lang.org/std/option/enum.Option.html#variant.None
 pub fn unfold<F, S, A>(value: S, f: F) -> impl Iterator<Item = A>
-where
-    F: Fn(S) -> Option<(A, S)>,
-{
-    let mut value = Some(value);
-    std::iter::from_fn(move || {
-        f(value.take().unwrap()).map(|(next, state)| {
-            value = Some(state);
-            next
-        })
+where F: Fn(S) -> Option<(A, S)> {
+  let mut value = Some(value);
+  std::iter::from_fn(move || {
+    f(value.take().unwrap()).map(|(next, state)| {
+      value = Some(state);
+      next
     })
+  })
 }

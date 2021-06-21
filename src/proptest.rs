@@ -15,7 +15,7 @@ use ::proptest::{
     ValueTree,
   },
 };
-use std::{
+use sp_std::{
   hash::Hash,
   iter::FromIterator,
   ops::Range,
