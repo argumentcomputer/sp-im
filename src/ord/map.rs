@@ -26,7 +26,6 @@ use std::{
     Formatter,
   },
   hash::{
-    BuildHasher,
     Hash,
     Hasher,
   },

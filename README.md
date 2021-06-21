@@ -16,6 +16,6 @@ http://mozilla.org/MPL/2.0/.
 ## Code of Conduct
 
 This project is released with a [Contributor Code of
-Conduct][coc]. By participating in this project you agree to abide by its
+Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its
 terms.
 
