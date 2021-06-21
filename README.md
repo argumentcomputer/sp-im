@@ -1,28 +1,20 @@
-# im-rs
+# sp-im
 
-[![Crate Status](https://img.shields.io/crates/v/im.svg)](https://crates.io/crates/im)
+Immutable `no_std` collection datatypes suitable for use within Substrate
 
-Blazing fast immutable collection datatypes for Rust.
+## License
 
-Comes in two versions: [`im`](https://crates.io/crates/im) (thread safe) and
-[`im-rc`](https://crates.io/crates/im-rc) (fast but not thread safe).
+Copyright 2021 Yatima Inc
 
-## Documentation
-
-* [API docs](https://docs.rs/im/)
-
-## Licence
-
-Copyright 2017 Bodil Stokke
-
-This software is subject to the terms of the Mozilla Public
-License, v. 2.0. If a copy of the MPL was not distributed with this
-file, You can obtain one at http://mozilla.org/MPL/2.0/.
+This project was forked from https://github.com/bodil/im-rs, commit
+3f4e01a43254fe228d1ce64e47dfaf4edc8f4f19 (Copyright 2017 Bodil Stokke) and
+contains code which is subject the terms of the Mozilla Public License, v. 2.0,
+a copy of which can be found in the the `licenses` directory or at
+http://mozilla.org/MPL/2.0/.
 
 ## Code of Conduct
 
-Please note that this project is released with a [Contributor Code of
+This project is released with a [Contributor Code of
 Conduct][coc]. By participating in this project you agree to abide by its
 terms.
 
-[coc]: https://github.com/bodil/im-rs/blob/master/CODE_OF_CONDUCT.md
