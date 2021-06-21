@@ -4,6 +4,7 @@ Immutable `no_std` collection datatypes suitable for use within Substrate
 
 ## License
 
+```
 Copyright 2021 Yatima Inc
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -22,6 +23,7 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
 
 This project was forked from
 https://github.com/bodil/im-rs/commit/3f4e01a43254fe228d1ce64e47dfaf4edc8f4f19
