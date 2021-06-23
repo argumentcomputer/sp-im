@@ -284,6 +284,15 @@ mod test {
     fn ser_ordset(v: OrdSet<i32>) -> bool {
       v == from_str::<OrdSet<i32>>(&to_string(&v).unwrap()).unwrap()
     }
+
+    fn ser_ordmap(v: OrdMap<i32, i32>) -> bool {
+      v == from_str::<OrdMap<i32, i32>>(&to_string(&v).unwrap()).unwrap()
+    }
+
+
+    fn ser_vector(v: Vector<i32>) -> bool {
+      v == from_str::<Vector<i32>>(&to_string(&v).unwrap()).unwrap()
+    }
   }
 
   // proptest! {

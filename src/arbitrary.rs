@@ -133,6 +133,18 @@ impl<A: quickcheck::Arbitrary + Ord + Clone> quickcheck::Arbitrary for OrdSet<A>
   }
 }
 
+impl<A: quickcheck::Arbitrary + Ord + Clone> quickcheck::Arbitrary for Vector<A> {
+  fn arbitrary(g: &mut quickcheck::Gen) -> Self {
+    Vector::from(Vec::<A>::arbitrary(g))
+  }
+}
+
+impl<A: quickcheck::Arbitrary + Ord + Clone> quickcheck::Arbitrary for OrdMap<A, A> {
+  fn arbitrary(g: &mut quickcheck::Gen) -> Self {
+    OrdMap::from(Vec::<(A,A)>::arbitrary(g))
+  }
+}
+
 // impl<'a, K, V, S> Arbitrary for HashMap<K, V, S>
 // where
 //   K: Arbitrary<'a> + Hash + Eq + Clone,
