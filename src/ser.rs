@@ -24,6 +24,7 @@ use sp_std::{
   hash::{
     BuildHasher,
   },
+  any::Any,
 };
 
 use crate::{
@@ -273,14 +274,15 @@ mod test {
   //   num::i32,
   //   proptest,
   // };
+  use ::arbitrary;
   use serde_json::{
     from_str,
     to_string,
   };
 
   quickcheck! {
-    fn ser_ordset<A: type>(v: OrdSet<A>) -> bool {
-      v == &from_str::<OrdSet<i32>>(&to_string(&v).unwrap()).unwrap();
+    fn ser_ordset(v: OrdSet<i32>) -> bool {
+      v == from_str::<OrdSet<i32>>(&to_string(&v).unwrap()).unwrap()
     }
   }
 

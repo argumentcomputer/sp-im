@@ -6,7 +6,7 @@ use std::iter::FromIterator;
 use crate::Vector;
 
 // use proptest::proptest;
-use quickcheck::Arbitrary;
+use arbitrary::Arbitrary;
 
 #[derive(Arbitrary, Debug)]
 enum Action<A> {

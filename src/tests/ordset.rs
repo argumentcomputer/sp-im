@@ -5,8 +5,8 @@ use std::fmt::{Debug, Error, Formatter, Write};
 
 use crate::OrdSet;
 
-use proptest::proptest;
-use proptest_derive::Arbitrary;
+// use proptest::proptest;
+use arbitrary::Arbitrary;
 
 #[derive(Arbitrary, Debug)]
 enum Action<A> {

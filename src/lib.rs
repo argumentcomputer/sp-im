@@ -302,7 +302,7 @@
 //!
 //! | Feature | Description |
 //! | ------- | ----------- |
-//! | [`proptest`](https://crates.io/crates/proptest) | Strategies for all `im` datatypes under a `proptest` namespace, eg. `im::vector::proptest::vector()` |
+//! | [`proptest`](https://crates.io/crates/proptest) | Strategies for all `im` datatypes under a `proptest` namespace, eg. `sp_im::vector::proptest::vector()` |
 //! | [`quickcheck`](https://crates.io/crates/quickcheck) | [`quickcheck::Arbitrary`](https://docs.rs/quickcheck/latest/quickcheck/trait.Arbitrary.html) implementations for all `im` datatypes (not available in `im-rc`) |
 //! | [`rayon`](https://crates.io/crates/rayon) | parallel iterator implementations for [`Vector`][vector::Vector] (not available in `im-rc`) |
 //! | [`serde`](https://crates.io/crates/serde) | [`Serialize`](https://docs.rs/serde/latest/serde/trait.Serialize.html) and [`Deserialize`](https://docs.rs/serde/latest/serde/trait.Deserialize.html) implementations for all `im` datatypes |
@@ -364,11 +364,11 @@ pub mod shared;
 #[doc(hidden)]
 pub mod ser;
 
-#[cfg(feature = "arbitrary")]
+#[cfg(test)]
 #[doc(hidden)]
 pub mod arbitrary;
 
-#[cfg(all(threadsafe, feature = "quickcheck"))]
+#[cfg(all(threadsafe))]
 #[doc(hidden)]
 pub mod quickcheck;
 
@@ -400,7 +400,7 @@ mod tests;
 /// # Examples
 ///
 /// ```
-/// # #[macro_use] extern crate im;
+/// # #[macro_use] extern crate sp_im;
 /// # use std::sync::Arc;
 /// # fn main() {
 /// let vec_inside_vec = vector![vector![1, 2, 3], vector![4, 5, 6]];
@@ -435,7 +435,7 @@ macro_rules! update_in {
 /// # Examples
 ///
 /// ```
-/// # #[macro_use] extern crate im;
+/// # #[macro_use] extern crate sp_im;
 /// # use std::sync::Arc;
 /// # fn main() {
 /// let vec_inside_vec = vector![vector![1, 2, 3], vector![4, 5, 6]];

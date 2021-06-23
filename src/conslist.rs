@@ -719,55 +719,58 @@ where
 
 // QuickCheck
 
-#[cfg(any(test, feature = "quickcheck"))]
-use quickcheck::{Arbitrary, Gen};
+// #[cfg(any(test))]
+// use arbitrary::{Arbitrary};
+#[cfg(any(test))]
+use quickcheck::{Gen, Arbitrary};
 
 #[cfg(any(test, feature = "quickcheck"))]
 impl<A: Arbitrary + Sync> Arbitrary for ConsList<A> {
-    fn arbitrary<G: Gen>(g: &mut G) -> Self {
+    fn arbitrary(g: &mut Gen) -> Self {
         ConsList::from(Vec::<A>::arbitrary(g))
     }
 }
 
 // Proptest
 
-#[cfg(any(test, feature = "proptest"))]
-pub mod proptest {
-    use super::*;
-    use ::proptest::strategy::{BoxedStrategy, Strategy, ValueTree};
-    use sp_std::ops::Range;
+//#[cfg(any(test, feature = "proptest"))]
+//pub mod proptest {
+//    use super::*;
+//    use ::proptest::strategy::{BoxedStrategy, Strategy, ValueTree};
+//    use sp_std::ops::Range;
 
-    /// A strategy for a cons list of a given size.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// proptest! {
-    ///     #[test]
-    ///     fn proptest_a_conslist(ref l in conslist(".*", 10..100)) {
-    ///         assert!(l.len() < 100);
-    ///         assert!(l.len() >= 10);
-    ///     }
-    /// }
-    /// ```
-    pub fn conslist<A: Strategy + 'static>(
-        element: A,
-        size: Range<usize>,
-    ) -> BoxedStrategy<ConsList<<A::Value as ValueTree>::Value>> {
-        ::proptest::collection::vec(element, size.clone())
-            .prop_map(ConsList::from)
-            .boxed()
-    }
-}
+//    /// A strategy for a cons list of a given size.
+//    ///
+//    /// # Examples
+//    ///
+//    /// ```rust,ignore
+//    /// proptest! {
+//    ///     #[test]
+//    ///     fn proptest_a_conslist(ref l in conslist(".*", 10..100)) {
+//    ///         assert!(l.len() < 100);
+//    ///         assert!(l.len() >= 10);
+//    ///     }
+//    /// }
+//    /// ```
+//    pub fn conslist<A: Strategy + 'static>(
+//        element: A,
+//        size: Range<usize>,
+//    ) -> BoxedStrategy<ConsList<<A::Value as ValueTree>::Value>> {
+//        ::proptest::collection::vec(element, size.clone())
+//            .prop_map(ConsList::from)
+//            .boxed()
+//    }
+//}
 
 // Tests
 
 #[cfg(test)]
 mod test {
-    use super::{proptest::*, *};
+    // use super::{proptest::*, *};
+    use super::*;
     use crate::test::is_sorted;
-    use ::proptest::*;
-    use alloc::string::String;
+    // use ::proptest::*;
+    use sp_std::alloc::string::String;
     use quickcheck::quickcheck;
 
     #[test]

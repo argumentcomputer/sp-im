@@ -20,7 +20,6 @@ use sp_std::{
   borrow::Borrow,
   cmp::Ordering,
   collections::{
-    self,
     btree_map,
   },
   fmt::{
@@ -73,8 +72,8 @@ pub use crate::nodes::btree::{
 /// # Examples
 ///
 /// ```
-/// # #[macro_use] extern crate im;
-/// # use im::ordmap::OrdMap;
+/// # #[macro_use] extern crate sp_im;
+/// # use sp_im::ordmap::OrdMap;
 /// # fn main() {
 /// assert_eq!(
 ///   ordmap! {
@@ -210,8 +209,8 @@ impl<K, V> OrdMap<K, V> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map = OrdMap::unit(123, "onetwothree");
   /// assert_eq!(map.get(&123), Some(&"onetwothree"));
   /// ```
@@ -230,8 +229,8 @@ impl<K, V> OrdMap<K, V> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// assert!(!ordmap! {1 => 2}.is_empty());
   /// assert!(OrdMap::<i32, i32>::new().is_empty());
   /// ```
@@ -259,8 +258,8 @@ impl<K, V> OrdMap<K, V> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// assert_eq!(
   ///   3,
   ///   ordmap! {
@@ -292,8 +291,8 @@ impl<K, V> OrdMap<K, V> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdMap;
   /// let mut map = ordmap![1=>1, 2=>2, 3=>3];
   /// map.clear();
   /// assert!(map.is_empty());
@@ -317,8 +316,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// assert_eq!(
   ///   Some(&(3, 33)),
   ///   ordmap! {
@@ -340,8 +339,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// assert_eq!(
   ///   Some(&(1, 11)),
   ///   ordmap! {
@@ -402,8 +401,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map = ordmap! {123 => "lol"};
   /// assert_eq!(map.get(&123), Some(&"lol"));
   /// ```
@@ -422,8 +421,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map = ordmap! {123 => "lol"};
   /// assert_eq!(map.get_key_value(&123), Some((&123, &"lol")));
   /// ```
@@ -446,8 +445,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdMap;
   /// let map = ordmap![1 => 1, 3 => 3, 5 => 5];
   /// assert_eq!(Some((&3, &3)), map.get_prev(&4));
   /// ```
@@ -470,8 +469,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdMap;
   /// let map = ordmap![1 => 1, 3 => 3, 5 => 5];
   /// assert_eq!(Some((&5, &5)), map.get_next(&4));
   /// ```
@@ -490,8 +489,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map = ordmap! {123 => "lol"};
   /// assert!(map.contains_key(&123));
   /// assert!(!map.contains_key(&321));
@@ -546,8 +545,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 2 => 2};
   /// let map2 = ordmap! {1 => 1, 2 => 2, 3 => 3};
   /// assert!(map1.is_submap(map2));
@@ -570,8 +569,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 2 => 2};
   /// let map2 = ordmap! {1 => 1, 2 => 2, 3 => 3};
   /// assert!(map1.is_proper_submap(map2));
@@ -601,8 +600,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let mut map = ordmap! {123 => "lol"};
   /// if let Some(value) = map.get_mut(&123) {
   ///   *value = "omg";
@@ -629,8 +628,8 @@ where
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdMap;
   /// let mut map = ordmap![1 => 1, 3 => 3, 5 => 5];
   /// if let Some((key, value)) = map.get_prev_mut(&4) {
   ///     *value = 4;
@@ -659,8 +658,8 @@ where
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdMap;
   /// let mut map = ordmap![1 => 1, 3 => 3, 5 => 5];
   /// if let Some((key, value)) = map.get_next_mut(&4) {
   ///     *value = 4;
@@ -692,8 +691,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let mut map = ordmap! {};
   /// map.insert(123, "123");
   /// map.insert(456, "456");
@@ -729,8 +728,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let mut map = ordmap! {123 => "123", 456 => "456"};
   /// map.remove(&123);
   /// map.remove(&456);
@@ -783,8 +782,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map = ordmap! {};
   /// assert_eq!(map.update(123, "123"), ordmap! {123 => "123"});
   /// ```
@@ -926,8 +925,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 3};
   /// let map2 = ordmap! {2 => 2, 3 => 4};
   /// let expected = ordmap! {1 => 1, 2 => 2, 3 => 3};
@@ -972,8 +971,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1, 2 => 2, 3 => 9};
@@ -1007,8 +1006,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 3};
   /// let map2 = ordmap! {2 => 2};
   /// let expected = ordmap! {1 => 1, 2 => 2, 3 => 3};
@@ -1068,8 +1067,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1, 2 => 2};
@@ -1091,8 +1090,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1, 2 => 2};
@@ -1144,8 +1143,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1, 2 => 2, 3 => 9};
@@ -1170,8 +1169,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1, 2 => 2, 3 => 9};
@@ -1215,8 +1214,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1};
@@ -1239,8 +1238,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 2 => 2};
   /// let map2 = ordmap! {2 => 3, 3 => 4};
   /// let expected = ordmap! {2 => 2};
@@ -1281,8 +1280,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 2 => 2};
   /// let map2 = ordmap! {2 => 3, 3 => 4};
   /// let expected = ordmap! {2 => 5};
