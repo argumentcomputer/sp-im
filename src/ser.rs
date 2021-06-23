@@ -21,6 +21,9 @@ use sp_std::{
   fmt,
   marker::PhantomData,
   ops::Deref,
+  hash::{
+    BuildHasher,
+  },
 };
 
 use crate::{
@@ -184,57 +187,57 @@ impl<K: Serialize + Ord + Clone, V: Serialize + Clone> Serialize
 
 // HashMap
 
-impl<'de, K, V, S> Deserialize<'de> for HashMap<K, V, S>
-where
-  K: Deserialize<'de> + Hash + Eq + Clone,
-  V: Deserialize<'de> + Clone,
-  S: BuildHasher + Default,
-{
-  fn deserialize<D>(des: D) -> Result<Self, D::Error>
-  where D: Deserializer<'de> {
-    des.deserialize_map(MapVisitor::<'de, HashMap<K, V, S>, K, V>::new())
-  }
-}
+// impl<'de, K, V, S> Deserialize<'de> for HashMap<K, V, S>
+// where
+//   K: Deserialize<'de> + Hash + Eq + Clone,
+//   V: Deserialize<'de> + Clone,
+//   S: BuildHasher + Default,
+// {
+//   fn deserialize<D>(des: D) -> Result<Self, D::Error>
+//   where D: Deserializer<'de> {
+//     des.deserialize_map(MapVisitor::<'de, HashMap<K, V, S>, K, V>::new())
+//   }
+// }
 
-impl<K, V, S> Serialize for HashMap<K, V, S>
-where
-  K: Serialize + Hash + Eq + Clone,
-  V: Serialize + Clone,
-  S: BuildHasher + Default,
-{
-  fn serialize<Ser>(&self, ser: Ser) -> Result<Ser::Ok, Ser::Error>
-  where Ser: Serializer {
-    let mut s = ser.serialize_map(Some(self.len()))?;
-    for (k, v) in self.iter() {
-      s.serialize_entry(k.deref(), v.deref())?;
-    }
-    s.end()
-  }
-}
+// impl<K, V, S> Serialize for HashMap<K, V, S>
+// where
+//   K: Serialize + Hash + Eq + Clone,
+//   V: Serialize + Clone,
+//   S: BuildHasher + Default,
+// {
+//   fn serialize<Ser>(&self, ser: Ser) -> Result<Ser::Ok, Ser::Error>
+//   where Ser: Serializer {
+//     let mut s = ser.serialize_map(Some(self.len()))?;
+//     for (k, v) in self.iter() {
+//       s.serialize_entry(k.deref(), v.deref())?;
+//     }
+//     s.end()
+//   }
+// }
 
 // HashSet
 
-impl<'de, A: Deserialize<'de> + Hash + Eq + Clone, S: BuildHasher + Default>
-  Deserialize<'de> for HashSet<A, S>
-{
-  fn deserialize<D>(des: D) -> Result<Self, D::Error>
-  where D: Deserializer<'de> {
-    des.deserialize_seq(SeqVisitor::new())
-  }
-}
+// impl<'de, A: Deserialize<'de> + Hash + Eq + Clone, S: BuildHasher + Default>
+//   Deserialize<'de> for HashSet<A, S>
+// {
+//   fn deserialize<D>(des: D) -> Result<Self, D::Error>
+//   where D: Deserializer<'de> {
+//     des.deserialize_seq(SeqVisitor::new())
+//   }
+// }
 
-impl<A: Serialize + Hash + Eq + Clone, S: BuildHasher + Default> Serialize
-  for HashSet<A, S>
-{
-  fn serialize<Ser>(&self, ser: Ser) -> Result<Ser::Ok, Ser::Error>
-  where Ser: Serializer {
-    let mut s = ser.serialize_seq(Some(self.len()))?;
-    for i in self.iter() {
-      s.serialize_element(i.deref())?;
-    }
-    s.end()
-  }
-}
+// impl<A: Serialize + Hash + Eq + Clone, S: BuildHasher + Default> Serialize
+//   for HashSet<A, S>
+// {
+//   fn serialize<Ser>(&self, ser: Ser) -> Result<Ser::Ok, Ser::Error>
+//   where Ser: Serializer {
+//     let mut s = ser.serialize_seq(Some(self.len()))?;
+//     for i in self.iter() {
+//       s.serialize_element(i.deref())?;
+//     }
+//     s.end()
+//   }
+// }
 
 // Vector
 
@@ -261,35 +264,41 @@ impl<A: Clone + Serialize> Serialize for Vector<A> {
 #[cfg(test)]
 mod test {
   use super::*;
-  use crate::proptest::{
-    ord_map,
-    ord_set,
-    vector,
-  };
-  use ::proptest::{
-    num::i32,
-    proptest,
-  };
+  // use crate::proptest::{
+  //   ord_map,
+  //   ord_set,
+  //   vector,
+  // };
+  // use ::proptest::{
+  //   num::i32,
+  //   proptest,
+  // };
   use serde_json::{
     from_str,
     to_string,
   };
 
-  proptest! {
-      #[test]
-      fn ser_ordset(ref v in ord_set(i32::ANY, 0..100)) {
-          assert_eq!(v, &from_str::<OrdSet<i32>>(&to_string(&v).unwrap()).unwrap());
-      }
-
-      #[test]
-      fn ser_ordmap(ref v in ord_map(i32::ANY, i32::ANY, 0..100)) {
-          assert_eq!(v, &from_str::<OrdMap<i32, i32>>(&to_string(&v).unwrap()).unwrap());
-      }
-
-
-      #[test]
-      fn ser_vector(ref v in vector(i32::ANY, 0..100)) {
-          assert_eq!(v, &from_str::<Vector<i32>>(&to_string(&v).unwrap()).unwrap());
-      }
+  quickcheck! {
+    fn ser_ordset<A: type>(v: OrdSet<A>) -> bool {
+      v == &from_str::<OrdSet<i32>>(&to_string(&v).unwrap()).unwrap();
+    }
   }
+
+  // proptest! {
+  //     #[test]
+  //     fn ser_ordset(ref v in ord_set(i32::ANY, 0..100)) {
+  //         assert_eq!(v, &from_str::<OrdSet<i32>>(&to_string(&v).unwrap()).unwrap());
+  //     }
+
+  //     #[test]
+  //     fn ser_ordmap(ref v in ord_map(i32::ANY, i32::ANY, 0..100)) {
+  //         assert_eq!(v, &from_str::<OrdMap<i32, i32>>(&to_string(&v).unwrap()).unwrap());
+  //     }
+
+
+  //     #[test]
+  //     fn ser_vector(ref v in vector(i32::ANY, 0..100)) {
+  //         assert_eq!(v, &from_str::<Vector<i32>>(&to_string(&v).unwrap()).unwrap());
+  //     }
+  // }
 }

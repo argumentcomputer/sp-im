@@ -19,7 +19,10 @@
 use sp_std::{
   borrow::Borrow,
   cmp::Ordering,
-  collections::btree_map,
+  collections::{
+    self,
+    btree_map,
+  },
   fmt::{
     Debug,
     Error,
@@ -1996,18 +1999,18 @@ where
 mod test {
   use super::*;
   use crate::{
-    proptest::*,
+    // proptest::*,
     test::is_sorted,
   };
-  use ::proptest::{
-    bool,
-    collection,
-    num::{
-      i16,
-      usize,
-    },
-    proptest,
-  };
+  // use ::proptest::{
+  //   bool,
+  //   collection,
+  //   num::{
+  //     i16,
+  //     usize,
+  //   },
+  //   proptest,
+  // };
 
   #[test]
   fn iterates_in_order() {
@@ -2234,220 +2237,220 @@ mod test {
     }
   }
 
-  proptest! {
-      #[test]
-      fn length(ref input in collection::btree_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
-          assert_eq!(input.len(), map.len());
-      }
+  // proptest! {
+  //     #[test]
+  //     fn length(ref input in collection::btree_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
+  //         assert_eq!(input.len(), map.len());
+  //     }
 
-      #[test]
-      fn order(ref input in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
-          assert!(is_sorted(map.keys()));
-      }
+  //     #[test]
+  //     fn order(ref input in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
+  //         assert!(is_sorted(map.keys()));
+  //     }
 
-      #[test]
-      fn overwrite_values(ref vec in collection::vec((i16::ANY, i16::ANY), 1..1000), index_rand in usize::ANY, new_val in i16::ANY) {
-          let index = vec[index_rand % vec.len()].0;
-          let map1 = OrdMap::from_iter(vec.clone());
-          let map2 = map1.update(index, new_val);
-          for (k, v) in map2 {
-              if k == index {
-                  assert_eq!(v, new_val);
-              } else {
-                  match map1.get(&k) {
-                      None => panic!("map1 didn't have key {:?}", k),
-                      Some(other_v) => {
-                          assert_eq!(v, *other_v);
-                      }
-                  }
-              }
-          }
-      }
+  //     #[test]
+  //     fn overwrite_values(ref vec in collection::vec((i16::ANY, i16::ANY), 1..1000), index_rand in usize::ANY, new_val in i16::ANY) {
+  //         let index = vec[index_rand % vec.len()].0;
+  //         let map1 = OrdMap::from_iter(vec.clone());
+  //         let map2 = map1.update(index, new_val);
+  //         for (k, v) in map2 {
+  //             if k == index {
+  //                 assert_eq!(v, new_val);
+  //             } else {
+  //                 match map1.get(&k) {
+  //                     None => panic!("map1 didn't have key {:?}", k),
+  //                     Some(other_v) => {
+  //                         assert_eq!(v, *other_v);
+  //                     }
+  //                 }
+  //             }
+  //         }
+  //     }
 
-      #[test]
-      fn delete_values(ref vec in collection::vec((usize::ANY, usize::ANY), 1..1000), index_rand in usize::ANY) {
-          let index = vec[index_rand % vec.len()].0;
-          let map1: OrdMap<usize, usize> = OrdMap::from_iter(vec.clone());
-          let map2 = map1.without(&index);
-          assert_eq!(map1.len(), map2.len() + 1);
-          for k in map2.keys() {
-              assert_ne!(*k, index);
-          }
-      }
+  //     #[test]
+  //     fn delete_values(ref vec in collection::vec((usize::ANY, usize::ANY), 1..1000), index_rand in usize::ANY) {
+  //         let index = vec[index_rand % vec.len()].0;
+  //         let map1: OrdMap<usize, usize> = OrdMap::from_iter(vec.clone());
+  //         let map2 = map1.without(&index);
+  //         assert_eq!(map1.len(), map2.len() + 1);
+  //         for k in map2.keys() {
+  //             assert_ne!(*k, index);
+  //         }
+  //     }
 
-      #[test]
-      fn insert_and_delete_values(
-          ref input in ord_map(0usize..64, 0usize..64, 1..1000),
-          ref ops in collection::vec((bool::ANY, usize::ANY, usize::ANY), 1..1000)
-      ) {
-          let mut map = input.clone();
-          let mut tree: collections::BTreeMap<usize, usize> = input.iter().map(|(k, v)| (*k, *v)).collect();
-          for (ins, key, val) in ops {
-              if *ins {
-                  tree.insert(*key, *val);
-                  map = map.update(*key, *val)
-              } else {
-                  tree.remove(key);
-                  map = map.without(key)
-              }
-          }
-          assert!(map.iter().map(|(k, v)| (*k, *v)).eq(tree.iter().map(|(k, v)| (*k, *v))));
-      }
+  //     #[test]
+  //     fn insert_and_delete_values(
+  //         ref input in ord_map(0usize..64, 0usize..64, 1..1000),
+  //         ref ops in collection::vec((bool::ANY, usize::ANY, usize::ANY), 1..1000)
+  //     ) {
+  //         let mut map = input.clone();
+  //         let mut tree: collections::BTreeMap<usize, usize> = input.iter().map(|(k, v)| (*k, *v)).collect();
+  //         for (ins, key, val) in ops {
+  //             if *ins {
+  //                 tree.insert(*key, *val);
+  //                 map = map.update(*key, *val)
+  //             } else {
+  //                 tree.remove(key);
+  //                 map = map.without(key)
+  //             }
+  //         }
+  //         assert!(map.iter().map(|(k, v)| (*k, *v)).eq(tree.iter().map(|(k, v)| (*k, *v))));
+  //     }
 
-      #[test]
-      fn proptest_works(ref m in ord_map(0..9999, ".*", 10..100)) {
-          assert!(m.len() < 100);
-          assert!(m.len() >= 10);
-      }
+  //     #[test]
+  //     fn proptest_works(ref m in ord_map(0..9999, ".*", 10..100)) {
+  //         assert!(m.len() < 100);
+  //         assert!(m.len() >= 10);
+  //     }
 
-      #[test]
-      fn insert_and_length(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let mut map: OrdMap<i16, i16> = OrdMap::new();
-          for (k, v) in m.iter() {
-              map = map.update(*k, *v)
-          }
-          assert_eq!(m.len(), map.len());
-      }
+  //     #[test]
+  //     fn insert_and_length(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let mut map: OrdMap<i16, i16> = OrdMap::new();
+  //         for (k, v) in m.iter() {
+  //             map = map.update(*k, *v)
+  //         }
+  //         assert_eq!(m.len(), map.len());
+  //     }
 
-      #[test]
-      fn from_iterator(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          assert_eq!(m.len(), map.len());
-      }
+  //     #[test]
+  //     fn from_iterator(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let map: OrdMap<i16, i16> =
+  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+  //         assert_eq!(m.len(), map.len());
+  //     }
 
-      #[test]
-      fn iterate_over(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          assert_eq!(m.len(), map.iter().count());
-      }
+  //     #[test]
+  //     fn iterate_over(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let map: OrdMap<i16, i16> =
+  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+  //         assert_eq!(m.len(), map.iter().count());
+  //     }
 
-      #[test]
-      fn equality(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map1: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          let map2: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          assert_eq!(map1, map2);
-      }
+  //     #[test]
+  //     fn equality(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let map1: OrdMap<i16, i16> =
+  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+  //         let map2: OrdMap<i16, i16> =
+  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+  //         assert_eq!(map1, map2);
+  //     }
 
-      #[test]
-      fn lookup(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          for (k, v) in m.iter() {
-              assert_eq!(Some(*v), map.get(k).cloned());
-          }
-      }
+  //     #[test]
+  //     fn lookup(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let map: OrdMap<i16, i16> =
+  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+  //         for (k, v) in m.iter() {
+  //             assert_eq!(Some(*v), map.get(k).cloned());
+  //         }
+  //     }
 
-      #[test]
-      fn remove(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-          let mut map: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          for k in m.keys() {
-              let l = map.len();
-              assert_eq!(m.get(k).cloned(), map.get(k).cloned());
-              map = map.without(k);
-              assert_eq!(None, map.get(k));
-              assert_eq!(l - 1, map.len());
-          }
-      }
+  //     #[test]
+  //     fn remove(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let mut map: OrdMap<i16, i16> =
+  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+  //         for k in m.keys() {
+  //             let l = map.len();
+  //             assert_eq!(m.get(k).cloned(), map.get(k).cloned());
+  //             map = map.without(k);
+  //             assert_eq!(None, map.get(k));
+  //             assert_eq!(l - 1, map.len());
+  //         }
+  //     }
 
-      #[test]
-      fn insert_mut(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-          let mut mut_map = OrdMap::new();
-          let mut map = OrdMap::new();
-          for (k, v) in m.iter() {
-              map = map.update(*k, *v);
-              mut_map.insert(*k, *v);
-          }
-          assert_eq!(map, mut_map);
-      }
+  //     #[test]
+  //     fn insert_mut(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let mut mut_map = OrdMap::new();
+  //         let mut map = OrdMap::new();
+  //         for (k, v) in m.iter() {
+  //             map = map.update(*k, *v);
+  //             mut_map.insert(*k, *v);
+  //         }
+  //         assert_eq!(map, mut_map);
+  //     }
 
-      #[test]
-      fn remove_mut(ref orig in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-          let mut map = orig.clone();
-          for key in orig.keys() {
-              let len = map.len();
-              assert_eq!(orig.get(key), map.get(key));
-              assert_eq!(orig.get(key).cloned(), map.remove(key));
-              assert_eq!(None, map.get(key));
-              assert_eq!(len - 1, map.len());
-          }
-      }
+  //     #[test]
+  //     fn remove_mut(ref orig in ord_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let mut map = orig.clone();
+  //         for key in orig.keys() {
+  //             let len = map.len();
+  //             assert_eq!(orig.get(key), map.get(key));
+  //             assert_eq!(orig.get(key).cloned(), map.remove(key));
+  //             assert_eq!(None, map.get(key));
+  //             assert_eq!(len - 1, map.len());
+  //         }
+  //     }
 
-      #[test]
-      fn remove_alien(ref orig in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let mut map = OrdMap::<i16, i16>::from(orig.clone());
-          for key in orig.keys() {
-              let len = map.len();
-              assert_eq!(orig.get(key), map.get(key));
-              assert_eq!(orig.get(key).cloned(), map.remove(key));
-              assert_eq!(None, map.get(key));
-              assert_eq!(len - 1, map.len());
-          }
-      }
+  //     #[test]
+  //     fn remove_alien(ref orig in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
+  //         let mut map = OrdMap::<i16, i16>::from(orig.clone());
+  //         for key in orig.keys() {
+  //             let len = map.len();
+  //             assert_eq!(orig.get(key), map.get(key));
+  //             assert_eq!(orig.get(key).cloned(), map.remove(key));
+  //             assert_eq!(None, map.get(key));
+  //             assert_eq!(len - 1, map.len());
+  //         }
+  //     }
 
-      #[test]
-      fn delete_and_reinsert(
-          ref input in collection::hash_map(i16::ANY, i16::ANY, 1..1000),
-          index_rand in usize::ANY
-      ) {
-          let index = *input.keys().nth(index_rand % input.len()).unwrap();
-          let map1 = OrdMap::from_iter(input.clone());
-          let (val, map2): (i16, _) = map1.extract(&index).unwrap();
-          let map3 = map2.update(index, val);
-          for key in map2.keys() {
-              assert!(*key != index);
-          }
-          assert_eq!(map1.len(), map2.len() + 1);
-          assert_eq!(map1, map3);
-      }
+  //     #[test]
+  //     fn delete_and_reinsert(
+  //         ref input in collection::hash_map(i16::ANY, i16::ANY, 1..1000),
+  //         index_rand in usize::ANY
+  //     ) {
+  //         let index = *input.keys().nth(index_rand % input.len()).unwrap();
+  //         let map1 = OrdMap::from_iter(input.clone());
+  //         let (val, map2): (i16, _) = map1.extract(&index).unwrap();
+  //         let map3 = map2.update(index, val);
+  //         for key in map2.keys() {
+  //             assert!(*key != index);
+  //         }
+  //         assert_eq!(map1.len(), map2.len() + 1);
+  //         assert_eq!(map1, map3);
+  //     }
 
-      #[test]
-      fn exact_size_iterator(ref m in ord_map(i16::ANY, i16::ANY, 1..1000)) {
-          let mut should_be = m.len();
-          let mut it = m.iter();
-          loop {
-              assert_eq!(should_be, it.len());
-              match it.next() {
-                  None => break,
-                  Some(_) => should_be -= 1,
-              }
-          }
-          assert_eq!(0, it.len());
-      }
+  //     #[test]
+  //     fn exact_size_iterator(ref m in ord_map(i16::ANY, i16::ANY, 1..1000)) {
+  //         let mut should_be = m.len();
+  //         let mut it = m.iter();
+  //         loop {
+  //             assert_eq!(should_be, it.len());
+  //             match it.next() {
+  //                 None => break,
+  //                 Some(_) => should_be -= 1,
+  //             }
+  //         }
+  //         assert_eq!(0, it.len());
+  //     }
 
-      #[test]
-      fn diff_all_values(a in collection::vec((usize::ANY, usize::ANY), 1..1000), b in collection::vec((usize::ANY, usize::ANY), 1..1000)) {
-          let a: OrdMap<usize, usize> = OrdMap::from(a);
-          let b: OrdMap<usize, usize> = OrdMap::from(b);
+  //     #[test]
+  //     fn diff_all_values(a in collection::vec((usize::ANY, usize::ANY), 1..1000), b in collection::vec((usize::ANY, usize::ANY), 1..1000)) {
+  //         let a: OrdMap<usize, usize> = OrdMap::from(a);
+  //         let b: OrdMap<usize, usize> = OrdMap::from(b);
 
-          let diff: Vec<_> = a.diff(&b).collect();
-          let union = b.clone().union(a.clone());
-          let expected: Vec<_> = union.iter().filter_map(|(k, v)| {
-              if a.contains_key(&k) {
-                  if b.contains_key(&k) {
-                      let old = a.get(&k).unwrap();
-                      if old != v	{
-                          Some(DiffItem::Update {
-                              old: (k, old),
-                              new: (k, v),
-                          })
-                      } else {
-                          None
-                      }
-                  } else {
-                      Some(DiffItem::Remove(k, v))
-                  }
-              } else {
-                  Some(DiffItem::Add(k, v))
-              }
-          }).collect();
-          assert_eq!(expected, diff);
-      }
-  }
+  //         let diff: Vec<_> = a.diff(&b).collect();
+  //         let union = b.clone().union(a.clone());
+  //         let expected: Vec<_> = union.iter().filter_map(|(k, v)| {
+  //             if a.contains_key(&k) {
+  //                 if b.contains_key(&k) {
+  //                     let old = a.get(&k).unwrap();
+  //                     if old != v	{
+  //                         Some(DiffItem::Update {
+  //                             old: (k, old),
+  //                             new: (k, v),
+  //                         })
+  //                     } else {
+  //                         None
+  //                     }
+  //                 } else {
+  //                     Some(DiffItem::Remove(k, v))
+  //                 }
+  //             } else {
+  //                 Some(DiffItem::Add(k, v))
+  //             }
+  //         }).collect();
+  //         assert_eq!(expected, diff);
+  //     }
+  // }
 }

@@ -831,11 +831,11 @@ mod test {
         }
     }
 
-    proptest! {
-        #[test]
-        fn proptest_a_conslist(ref l in conslist(".*", 10..100)) {
-            assert!(l.len() < 100);
-            assert!(l.len() >= 10);
-        }
-    }
+    // proptest! {
+    //     #[test]
+    //     fn proptest_a_conslist(ref l in conslist(".*", 10..100)) {
+    //         assert!(l.len() < 100);
+    //         assert!(l.len() >= 10);
+    //     }
+    // }
 }

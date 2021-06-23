@@ -372,6 +372,10 @@ pub mod arbitrary;
 #[doc(hidden)]
 pub mod quickcheck;
 
+#[cfg(test)]
+#[macro_use]
+extern crate quickcheck;
+
 #[cfg(any(threadsafe, not(feature = "pool")))]
 mod fakepool;
 
