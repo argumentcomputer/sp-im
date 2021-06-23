@@ -2,30 +2,55 @@
 
 use std::fmt::{Debug, Error, Formatter, Write};
 use std::iter::FromIterator;
-
+use rand::Rng;
 use crate::Vector;
 
 // use proptest::proptest;
-use arbitrary::Arbitrary;
+// use arbitrary::Arbitrary;
+use quickcheck::Arbitrary;
 
-#[derive(Arbitrary, Debug)]
+#[derive(Debug, Clone)]
 enum Action<A> {
-    PushFront(A),
-    PushBack(A),
-    PopFront,
-    PopBack,
-    Insert(usize, A),
-    Remove(usize),
-    JoinLeft(Vec<A>),
-    JoinRight(Vec<A>),
-    SplitLeft(usize),
-    SplitRight(usize),
+  PushFront(A),
+  PushBack(A),
+  PopFront,
+  PopBack,
+  Insert(usize, A),
+  Remove(usize),
+  JoinLeft(Vec<A>),
+  JoinRight(Vec<A>),
+  SplitLeft(usize),
+  SplitRight(usize),
 }
 
-#[derive(Arbitrary)]
+#[derive(Clone)]
 struct Actions<A>(Vec<Action<A>>)
-where
-    A: Clone;
+where A: Clone;
+
+impl<A: quickcheck::Arbitrary> quickcheck::Arbitrary for Action<A> {
+  fn arbitrary(g: &mut quickcheck::Gen) -> Self {
+    let mut rng = rand::thread_rng();
+    match rng.gen_range(0..=9) {
+      0 => Action::PushFront(A::arbitrary(g)),
+      1 => Action::PushBack(A::arbitrary(g)),
+      2 => Action::PopFront,
+      3 => Action::PopBack,
+      4 => Action::Insert(usize::arbitrary(g), A::arbitrary(g)),
+      5 => Action::Remove(usize::arbitrary(g)),
+      6 => Action::JoinLeft(Vec::<A>::arbitrary(g)),
+      7 => Action::JoinRight(Vec::<A>::arbitrary(g)),
+      8 => Action::SplitLeft(usize::arbitrary(g)),
+      9 => Action::SplitRight(usize::arbitrary(g)),
+      _ => Action::SplitRight(usize::arbitrary(g)),
+    }
+  }
+}
+
+impl<A: quickcheck::Arbitrary> quickcheck::Arbitrary for Actions<A> {
+  fn arbitrary(g: &mut quickcheck::Gen) -> Self {
+    Actions(Vec::<Action<A>>::arbitrary(g))
+  }
+}
 
 impl<A> Debug for Actions<A>
 where
@@ -105,7 +130,7 @@ where
             writeln!(out, "// len = {:?}", expected.len())?;
         }
         writeln!(out, "let expected = vec!{:?};", expected)?;
-        writeln!(out, "assert_eq!(Vector::from(expected), vec);")?;
+        writeln!(out, "assert_eq!(Vector::from(expected) == vec);")?;
         write!(f, "{}", super::code_fmt(&out))
     }
 }
@@ -118,105 +143,106 @@ fn cap_index(len: usize, index: usize) -> usize {
     }
 }
 
-// proptest! {
-//     #[test]
-//     fn comprehensive(actions: Actions<u8>) {
-//         let mut vec = Vector::new();
-//         let mut nat = Vec::new();
-//         vec.assert_invariants();
-//         for action in actions.0 {
-//             match action {
-//                 Action::PushFront(value) => {
-//                     let len = vec.len();
-//                     nat.insert(0, value);
-//                     vec.push_front(value);
-//                     assert_eq!(len + 1, vec.len());
-//                 }
-//                 Action::PushBack(value) => {
-//                     let len = vec.len();
-//                     nat.push(value);
-//                     vec.push_back(value);
-//                     assert_eq!(len + 1, vec.len());
-//                 }
-//                 Action::PopFront => {
-//                     if vec.is_empty() {
-//                         assert_eq!(None, vec.pop_front());
-//                     } else {
-//                         let len = vec.len();
-//                         assert_eq!(nat.remove(0), vec.pop_front().unwrap());
-//                         assert_eq!(len - 1, vec.len());
-//                     }
-//                 }
-//                 Action::PopBack => {
-//                     if vec.is_empty() {
-//                         assert_eq!(None, vec.pop_back());
-//                     } else {
-//                         let len = vec.len();
-//                         assert_eq!(nat.pop(), vec.pop_back());
-//                         assert_eq!(len - 1, vec.len());
-//                     }
-//                 }
-//                 Action::Insert(index, value) => {
-//                     let index = cap_index(vec.len(), index);
-//                     let len = vec.len();
-//                     nat.insert(index, value);
-//                     vec.insert(index, value);
-//                     assert_eq!(len + 1, vec.len());
-//                 }
-//                 Action::Remove(index) => {
-//                     if vec.is_empty() {
-//                         continue;
-//                     }
-//                     let index = cap_index(vec.len(), index);
-//                     let len = vec.len();
-//                     assert_eq!(nat.remove(index), vec.remove(index));
-//                     assert_eq!(len - 1, vec.len());
-//                 }
-//                 Action::JoinLeft(mut new_nat) => {
-//                     let mut new_vec = Vector::from_iter(new_nat.iter().cloned());
-//                     let add_len = new_nat.len();
-//                     let len = vec.len();
-//                     new_vec.append(vec);
-//                     vec = new_vec;
-//                     new_nat.append(&mut nat);
-//                     nat = new_nat;
-//                     assert_eq!(len + add_len, vec.len());
-//                 }
-//                 Action::JoinRight(mut new_nat) => {
-//                     let new_vec = Vector::from_iter(new_nat.iter().cloned());
-//                     let add_len = new_nat.len();
-//                     let len = vec.len();
-//                     vec.append(new_vec);
-//                     nat.append(&mut new_nat);
-//                     assert_eq!(len + add_len, vec.len());
-//                 }
-//                 Action::SplitLeft(index) => {
-//                     let index = cap_index(vec.len(), index);
-//                     let len = vec.len();
-//                     let vec_right = vec.split_off(index);
-//                     let nat_right = nat.split_off(index);
-//                     assert_eq!(index, vec.len());
-//                     assert_eq!(len - index, vec_right.len());
-//                     assert_eq!(Vector::from_iter(nat_right.iter().cloned()), vec_right);
-//                 }
-//                 Action::SplitRight(index) => {
-//                     let index = cap_index(vec.len(), index);
-//                     let len = vec.len();
-//                     let vec_right = vec.split_off(index);
-//                     let nat_right = nat.split_off(index);
-//                     assert_eq!(index, vec.len());
-//                     assert_eq!(len - index, vec_right.len());
-//                     assert_eq!(Vector::from_iter(nat.iter().cloned()), vec);
-//                     vec = vec_right;
-//                     nat = nat_right;
-//                 }
-//             }
-//             vec.assert_invariants();
-//             assert_eq!(nat.len(),vec.len());
-//             assert_eq!(Vector::from_iter(nat.iter().cloned()), vec);
-//         }
-//     }
-// }
+quickcheck! {
+  fn comprehensive(actions: Actions<u8>) -> bool {
+    let mut vec = Vector::new();
+    let mut nat = Vec::new();
+    let mut res: bool = true;
+    vec.assert_invariants();
+    for action in actions.0 {
+      match action {
+        Action::PushFront(value) => {
+          let len = vec.len();
+          nat.insert(0, value);
+          vec.push_front(value);
+          res = res && len + 1 == vec.len();
+        }
+        Action::PushBack(value) => {
+          let len = vec.len();
+          nat.push(value);
+          vec.push_back(value);
+           res = res && len + 1 == vec.len();
+        }
+        Action::PopFront => {
+          if vec.is_empty() {
+             res = res && None == vec.pop_front();
+          } else {
+            let len = vec.len();
+             res = res && nat.remove(0) == vec.pop_front().unwrap();
+             res = res && len - 1 == vec.len();
+          }
+        }
+        Action::PopBack => {
+          if vec.is_empty() {
+             res = res && None == vec.pop_back();
+          } else {
+            let len = vec.len();
+            res = res && nat.pop() == vec.pop_back();
+            res = res && len - 1 == vec.len();
+          }
+        }
+        Action::Insert(index, value) => {
+          let index = cap_index(vec.len(), index);
+          let len = vec.len();
+          nat.insert(index, value);
+          vec.insert(index, value);
+          res = res && len + 1 == vec.len();
+        }
+        Action::Remove(index) => {
+          if vec.is_empty() {
+            continue;
+          }
+          let index = cap_index(vec.len(), index);
+          let len = vec.len();
+          res = res && nat.remove(index) == vec.remove(index);
+          res = res && len - 1 == vec.len();
+        }
+        Action::JoinLeft(mut new_nat) => {
+          let mut new_vec = Vector::from_iter(new_nat.iter().cloned());
+          let add_len = new_nat.len();
+          let len = vec.len();
+          new_vec.append(vec);
+          vec = new_vec;
+          new_nat.append(&mut nat);
+          nat = new_nat;
+          res = res && len + add_len == vec.len();
+        }
+        Action::JoinRight(mut new_nat) => {
+          let new_vec = Vector::from_iter(new_nat.iter().cloned());
+          let add_len = new_nat.len();
+          let len = vec.len();
+          vec.append(new_vec);
+          nat.append(&mut new_nat);
+          res = res && len + add_len == vec.len();
+        }
+        Action::SplitLeft(index) => {
+          let index = cap_index(vec.len(), index);
+          let len = vec.len();
+          let vec_right = vec.split_off(index);
+          let nat_right = nat.split_off(index);
+          res = res && index == vec.len();
+          res = res && len - index == vec_right.len();
+          res = res && Vector::from_iter(nat_right.iter().cloned()) == vec_right;
+        }
+        Action::SplitRight(index) => {
+          let index = cap_index(vec.len(), index);
+          let len = vec.len();
+          let vec_right = vec.split_off(index);
+          let nat_right = nat.split_off(index);
+          res = res && index == vec.len();
+          res = res && len - index == vec_right.len();
+          res = res && Vector::from_iter(nat.iter().cloned()) == vec;
+          vec = vec_right;
+          nat = nat_right;
+        }
+      }
+      vec.assert_invariants();
+      res = res && nat.len() == vec.len();
+      res = res && Vector::from_iter(nat.iter().cloned()) == vec;
+    }
+    res
+  }
+}
 
 #[test]
 fn test_inserts() {
