@@ -22,6 +22,7 @@ use sp_std::{
   collections::{
     btree_map,
   },
+  vec::Vec,
   fmt::{
     Debug,
     Error,
@@ -2001,6 +2002,12 @@ mod test {
     // proptest::*,
     test::is_sorted,
   };
+  use rand::{
+    Rng,
+    random,
+    thread_rng,
+    seq::SliceRandom,
+  };
   // use ::proptest::{
   //   bool,
   //   collection,
@@ -2233,6 +2240,44 @@ mod test {
       else if line.starts_with("remove ") {
         map.remove(&line[7..].parse::<u32>().unwrap());
       }
+    }
+  }
+
+  quickcheck! {
+    fn length(input: btree_map::BTreeMap<i16, i16>) -> bool {
+      let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
+      input.len() == map.len()
+    }
+
+    fn order(input: btree_map::BTreeMap<i16, i16>) -> bool {
+      let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
+      is_sorted(map.keys())
+    }
+
+    fn overwrite_values(vec: Vec<(i16, i16)>) -> bool {
+      if vec.len() == 0 {
+        return true;
+      }
+
+      let mut rng = thread_rng();
+      let index_rand: i16 = rng.gen_range(0..vec.len()) as i16;
+      let new_val: i16 = random();
+      let map1 = OrdMap::from_iter(vec.clone());
+      let map2 = map1.update(index_rand, new_val);
+      let mut res = true;
+      for (k, v) in map2 {
+        if k == index_rand {
+          res = res && v == new_val;
+        } else {
+          match map1.get(&k) {
+            None => panic!("map1 didn't have key {:?}", k),
+            Some(other_v) => {
+              res = res && v == *other_v
+            }
+          }
+        }
+      }
+      res
     }
   }
 
