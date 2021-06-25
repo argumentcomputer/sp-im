@@ -2389,6 +2389,19 @@ mod test {
       }
       res
     }
+
+    fn remove_alien(orig: BTreeMap<i16, i16>) -> bool {
+      let mut map = OrdMap::<i16, i16>::from(orig.clone());
+      let mut res = true;
+      for key in orig.keys() {
+        let len = map.len();
+        res = orig.get(key) == map.get(key)
+        && orig.get(key).cloned() == map.remove(key)
+        && None == map.get(key)
+        && len - 1 == map.len()
+      }
+      res
+    }
   }
 
 
@@ -2396,16 +2409,6 @@ mod test {
   //     #[test]
 
   //     #[test]
-  //     fn remove_alien(ref orig in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let mut map = OrdMap::<i16, i16>::from(orig.clone());
-  //         for key in orig.keys() {
-  //             let len = map.len();
-  //             assert_eq!(orig.get(key), map.get(key));
-  //             assert_eq!(orig.get(key).cloned(), map.remove(key));
-  //             assert_eq!(None, map.get(key));
-  //             assert_eq!(len - 1, map.len());
-  //         }
-  //     }
 
   //     #[test]
   //     fn delete_and_reinsert(
