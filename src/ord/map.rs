@@ -2296,6 +2296,24 @@ mod test {
       }
       res
     }
+
+    fn insert_and_delete_values(
+      input: OrdMap<usize,usize>,
+      ops: Vec<(bool, usize, usize)>
+    ) -> bool {
+      let mut map = input.clone();
+      let mut tree: btree_map::BTreeMap<usize, usize> = input.iter().map(|(k, v)| (*k, *v)).collect();
+      for (ins, key, val) in &ops {
+        if *ins {
+          tree.insert(*key, *val);
+          map = map.update(*key, *val)
+        } else {
+          tree.remove(key);
+          map = map.without(key)
+        }
+      }
+      map.iter().map(|(k, v)| (*k, *v)).eq(tree.iter().map(|(k, v)| (*k, *v)))
+    }
   }
 
   // proptest! {
@@ -2303,23 +2321,6 @@ mod test {
   //     #[test]
 
   //     #[test]
-  //     fn insert_and_delete_values(
-  //         ref input in ord_map(0usize..64, 0usize..64, 1..1000),
-  //         ref ops in collection::vec((bool::ANY, usize::ANY, usize::ANY), 1..1000)
-  //     ) {
-  //         let mut map = input.clone();
-  //         let mut tree: collections::BTreeMap<usize, usize> = input.iter().map(|(k, v)| (*k, *v)).collect();
-  //         for (ins, key, val) in ops {
-  //             if *ins {
-  //                 tree.insert(*key, *val);
-  //                 map = map.update(*key, *val)
-  //             } else {
-  //                 tree.remove(key);
-  //                 map = map.without(key)
-  //             }
-  //         }
-  //         assert!(map.iter().map(|(k, v)| (*k, *v)).eq(tree.iter().map(|(k, v)| (*k, *v))));
-  //     }
 
   //     #[test]
   //     fn proptest_works(ref m in ord_map(0..9999, ".*", 10..100)) {
