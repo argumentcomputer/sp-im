@@ -20,7 +20,7 @@ use sp_std::{
   borrow::Borrow,
   cmp::Ordering,
   collections::{
-    btree_map,
+    btree_map::{self, BTreeMap},
   },
   vec::Vec,
   fmt::{
@@ -2314,35 +2314,24 @@ mod test {
       }
       map.iter().map(|(k, v)| (*k, *v)).eq(tree.iter().map(|(k, v)| (*k, *v)))
     }
+
+    fn insert_and_length(m: btree_map::BTreeMap<i16, i16>) -> bool {
+      let mut map: OrdMap<i16, i16> = OrdMap::new();
+      for (k, v) in m.iter() {
+        map = map.update(*k, *v)
+      }
+      m.len() == map.len()
+    }
+
+    fn from_iterator(m: BTreeMap<i16, i16>) -> bool {
+      let map: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      m.len() == map.len()
+    }
   }
 
-  // proptest! {
 
   //     #[test]
-
-  //     #[test]
-
-  //     #[test]
-  //     fn proptest_works(ref m in ord_map(0..9999, ".*", 10..100)) {
-  //         assert!(m.len() < 100);
-  //         assert!(m.len() >= 10);
-  //     }
-
-  //     #[test]
-  //     fn insert_and_length(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let mut map: OrdMap<i16, i16> = OrdMap::new();
-  //         for (k, v) in m.iter() {
-  //             map = map.update(*k, *v)
-  //         }
-  //         assert_eq!(m.len(), map.len());
-  //     }
-
-  //     #[test]
-  //     fn from_iterator(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let map: OrdMap<i16, i16> =
-  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-  //         assert_eq!(m.len(), map.len());
-  //     }
 
   //     #[test]
   //     fn iterate_over(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
