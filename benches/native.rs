@@ -4,7 +4,7 @@
 
 #![feature(test)]
 
-extern crate im;
+extern crate sp_im;
 extern crate rand;
 extern crate test;
 
