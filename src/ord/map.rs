@@ -22,7 +22,10 @@ use sp_std::{
     ToOwned,
   },
   cmp::Ordering,
-  collections::btree_map,
+  collections::{
+    btree_map::{self, BTreeMap},
+  },
+  vec::Vec,
   fmt::{
     Debug,
     Error,
@@ -74,8 +77,8 @@ pub use crate::nodes::btree::{
 /// # Examples
 ///
 /// ```
-/// # #[macro_use] extern crate im;
-/// # use im::ordmap::OrdMap;
+/// # #[macro_use] extern crate sp_im;
+/// # use sp_im::ordmap::OrdMap;
 /// # fn main() {
 /// assert_eq!(
 ///   ordmap! {
@@ -211,8 +214,8 @@ impl<K, V> OrdMap<K, V> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map = OrdMap::unit(123, "onetwothree");
   /// assert_eq!(map.get(&123), Some(&"onetwothree"));
   /// ```
@@ -231,8 +234,8 @@ impl<K, V> OrdMap<K, V> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// assert!(!ordmap! {1 => 2}.is_empty());
   /// assert!(OrdMap::<i32, i32>::new().is_empty());
   /// ```
@@ -260,8 +263,8 @@ impl<K, V> OrdMap<K, V> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// assert_eq!(
   ///   3,
   ///   ordmap! {
@@ -293,8 +296,8 @@ impl<K, V> OrdMap<K, V> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdMap;
   /// let mut map = ordmap![1=>1, 2=>2, 3=>3];
   /// map.clear();
   /// assert!(map.is_empty());
@@ -318,8 +321,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// assert_eq!(
   ///   Some(&(3, 33)),
   ///   ordmap! {
@@ -341,8 +344,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// assert_eq!(
   ///   Some(&(1, 11)),
   ///   ordmap! {
@@ -403,8 +406,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map = ordmap! {123 => "lol"};
   /// assert_eq!(map.get(&123), Some(&"lol"));
   /// ```
@@ -423,8 +426,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map = ordmap! {123 => "lol"};
   /// assert_eq!(map.get_key_value(&123), Some((&123, &"lol")));
   /// ```
@@ -447,8 +450,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdMap;
   /// let map = ordmap![1 => 1, 3 => 3, 5 => 5];
   /// assert_eq!(Some((&3, &3)), map.get_prev(&4));
   /// ```
@@ -471,8 +474,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdMap;
   /// let map = ordmap![1 => 1, 3 => 3, 5 => 5];
   /// assert_eq!(Some((&5, &5)), map.get_next(&4));
   /// ```
@@ -491,8 +494,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map = ordmap! {123 => "lol"};
   /// assert!(map.contains_key(&123));
   /// assert!(!map.contains_key(&321));
@@ -547,8 +550,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 2 => 2};
   /// let map2 = ordmap! {1 => 1, 2 => 2, 3 => 3};
   /// assert!(map1.is_submap(map2));
@@ -571,8 +574,8 @@ where K: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 2 => 2};
   /// let map2 = ordmap! {1 => 1, 2 => 2, 3 => 3};
   /// assert!(map1.is_proper_submap(map2));
@@ -602,8 +605,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let mut map = ordmap! {123 => "lol"};
   /// if let Some(value) = map.get_mut(&123) {
   ///   *value = "omg";
@@ -630,8 +633,8 @@ where
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdMap;
   /// let mut map = ordmap![1 => 1, 3 => 3, 5 => 5];
   /// if let Some((key, value)) = map.get_prev_mut(&4) {
   ///     *value = 4;
@@ -660,8 +663,8 @@ where
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdMap;
   /// let mut map = ordmap![1 => 1, 3 => 3, 5 => 5];
   /// if let Some((key, value)) = map.get_next_mut(&4) {
   ///     *value = 4;
@@ -693,8 +696,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let mut map = ordmap! {};
   /// map.insert(123, "123");
   /// map.insert(456, "456");
@@ -730,8 +733,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let mut map = ordmap! {123 => "123", 456 => "456"};
   /// map.remove(&123);
   /// map.remove(&456);
@@ -784,8 +787,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map = ordmap! {};
   /// assert_eq!(map.update(123, "123"), ordmap! {123 => "123"});
   /// ```
@@ -927,8 +930,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 3};
   /// let map2 = ordmap! {2 => 2, 3 => 4};
   /// let expected = ordmap! {1 => 1, 2 => 2, 3 => 3};
@@ -973,8 +976,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1, 2 => 2, 3 => 9};
@@ -1008,8 +1011,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 3};
   /// let map2 = ordmap! {2 => 2};
   /// let expected = ordmap! {1 => 1, 2 => 2, 3 => 3};
@@ -1069,8 +1072,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1, 2 => 2};
@@ -1092,8 +1095,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1, 2 => 2};
@@ -1145,8 +1148,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1, 2 => 2, 3 => 9};
@@ -1171,8 +1174,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1, 2 => 2, 3 => 9};
@@ -1216,8 +1219,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 3 => 4};
   /// let map2 = ordmap! {2 => 2, 3 => 5};
   /// let expected = ordmap! {1 => 1};
@@ -1240,8 +1243,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 2 => 2};
   /// let map2 = ordmap! {2 => 3, 3 => 4};
   /// let expected = ordmap! {2 => 2};
@@ -1282,8 +1285,8 @@ where
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordmap::OrdMap;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordmap::OrdMap;
   /// let map1 = ordmap! {1 => 1, 2 => 2};
   /// let map2 = ordmap! {2 => 3, 3 => 4};
   /// let expected = ordmap! {2 => 5};
@@ -1969,12 +1972,12 @@ where
   }
 }
 
-impl<K: Ord, V, RK, RV> From<btree_map::BTreeMap<RK, RV>> for OrdMap<K, V>
+impl<K: Ord, V, RK, RV> From<BTreeMap<RK, RV>> for OrdMap<K, V>
 where
   K: Ord + Clone + From<RK>,
   V: Clone + From<RV>,
 {
-  fn from(m: btree_map::BTreeMap<RK, RV>) -> OrdMap<K, V> {
+  fn from(m: BTreeMap<RK, RV>) -> OrdMap<K, V> {
     m.into_iter().collect()
   }
 }
@@ -2000,18 +2003,24 @@ where
 mod test {
   use super::*;
   use crate::{
-    proptest::*,
+    // proptest::*,
     test::is_sorted,
   };
-  use ::proptest::{
-    bool,
-    collection,
-    num::{
-      i16,
-      usize,
-    },
-    proptest,
+  use rand::{
+    Rng,
+    random,
+    thread_rng,
+    seq::SliceRandom,
   };
+  // use ::proptest::{
+  //   bool,
+  //   collection,
+  //   num::{
+  //     i16,
+  //     usize,
+  //   },
+  //   proptest,
+  // };
 
   #[test]
   fn iterates_in_order() {
@@ -2238,220 +2247,227 @@ mod test {
     }
   }
 
-  proptest! {
-      #[test]
-      fn length(ref input in collection::btree_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
-          assert_eq!(input.len(), map.len());
+  quickcheck! {
+    fn length(input: btree_map::BTreeMap<i16, i16>) -> bool {
+      let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
+      input.len() == map.len()
+    }
+
+    fn order(input: btree_map::BTreeMap<i16, i16>) -> bool {
+      let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
+      is_sorted(map.keys())
+    }
+
+    fn overwrite_values(vec: Vec<(i16, i16)>) -> bool {
+      if vec.len() == 0 {
+        return true;
       }
 
-      #[test]
-      fn order(ref input in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
-          assert!(is_sorted(map.keys()));
-      }
-
-      #[test]
-      fn overwrite_values(ref vec in collection::vec((i16::ANY, i16::ANY), 1..1000), index_rand in usize::ANY, new_val in i16::ANY) {
-          let index = vec[index_rand % vec.len()].0;
-          let map1 = OrdMap::from_iter(vec.clone());
-          let map2 = map1.update(index, new_val);
-          for (k, v) in map2 {
-              if k == index {
-                  assert_eq!(v, new_val);
-              } else {
-                  match map1.get(&k) {
-                      None => panic!("map1 didn't have key {:?}", k),
-                      Some(other_v) => {
-                          assert_eq!(v, *other_v);
-                      }
-                  }
-              }
+      let mut rng = thread_rng();
+      let index_rand: i16 = rng.gen_range(0..vec.len()) as i16;
+      let new_val: i16 = random();
+      let map1 = OrdMap::from_iter(vec.clone());
+      let map2 = map1.update(index_rand, new_val);
+      let mut res = true;
+      for (k, v) in map2 {
+        if k == index_rand {
+          res = res && v == new_val;
+        } else {
+          match map1.get(&k) {
+            None => panic!("map1 didn't have key {:?}", k),
+            Some(other_v) => {
+              res = res && v == *other_v
+            }
           }
+        }
+      }
+      res
+    }
+
+    fn delete_values(vec: Vec<(usize, usize)>) -> bool {
+      if vec.len() == 0 {
+        return true;
       }
 
-      #[test]
-      fn delete_values(ref vec in collection::vec((usize::ANY, usize::ANY), 1..1000), index_rand in usize::ANY) {
-          let index = vec[index_rand % vec.len()].0;
-          let map1: OrdMap<usize, usize> = OrdMap::from_iter(vec.clone());
-          let map2 = map1.without(&index);
-          assert_eq!(map1.len(), map2.len() + 1);
-          for k in map2.keys() {
-              assert_ne!(*k, index);
+      let mut rng = thread_rng();
+      let index = vec.choose(&mut rng).unwrap().0;
+      let map1: OrdMap<usize, usize> = OrdMap::from_iter(vec.clone());
+      let map2 = map1.without(&index);
+      let mut res = true;
+      res = res && map1.len() == map2.len() + 1;
+      for k in map2.keys() {
+        res = res && *k != index;
+      }
+      res
+    }
+
+    fn insert_and_delete_values(
+      input: OrdMap<usize,usize>,
+      ops: Vec<(bool, usize, usize)>
+    ) -> bool {
+      let mut map = input.clone();
+      let mut tree: btree_map::BTreeMap<usize, usize> = input.iter().map(|(k, v)| (*k, *v)).collect();
+      for (ins, key, val) in &ops {
+        if *ins {
+          tree.insert(*key, *val);
+          map = map.update(*key, *val)
+        } else {
+          tree.remove(key);
+          map = map.without(key)
+        }
+      }
+      map.iter().map(|(k, v)| (*k, *v)).eq(tree.iter().map(|(k, v)| (*k, *v)))
+    }
+
+    fn insert_and_length(m: btree_map::BTreeMap<i16, i16>) -> bool {
+      let mut map: OrdMap<i16, i16> = OrdMap::new();
+      for (k, v) in m.iter() {
+        map = map.update(*k, *v)
+      }
+      m.len() == map.len()
+    }
+
+    fn from_iterator(m: BTreeMap<i16, i16>) -> bool {
+      let map: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      m.len() == map.len()
+    }
+
+    fn iterate_over(m: BTreeMap<i16,i16>) -> bool {
+      let map: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      m.len() == map.iter().count()
+    }
+    
+    fn equality(m: BTreeMap<i16, i16>) -> bool {
+      let map1: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      let map2: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      map1 == map2
+    }
+
+    fn lookup(m: BTreeMap<i16, i16>) -> bool {
+      let map: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      for (k, v) in m.iter() {
+        if Some(*v) != map.get(k).cloned() {
+          return false;
+        }
+      }
+      true
+    }
+
+    fn remove(m: BTreeMap<i16, i16>) -> bool {
+      let mut map: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      let mut res = true;
+      for k in m.keys() {
+        let l = map.len();
+        res = res && m.get(k).cloned() == map.get(k).cloned();
+        map = map.without(k);
+        res = res && None == map.get(k) && l - 1 == map.len();
+      }
+      res
+    }
+
+    fn insert_mut(m: BTreeMap<i16, i16>) -> bool {
+      let mut mut_map = OrdMap::new();
+      let mut map = OrdMap::new();
+      for (k, v) in m.iter() {
+        map = map.update(*k, *v);
+        mut_map.insert(*k, *v);
+      }
+      map == mut_map
+    }
+
+    fn remove_mut(orig: BTreeMap<i16, i16>) -> bool {
+      let mut map = orig.clone();
+      let mut res = true;
+      for key in orig.keys() {
+        let len = map.len();
+        res = res && orig.get(key) == map.get(key);
+        res = res && orig.get(key).cloned() == map.remove(key);
+        res = res && None == map.get(key);
+        res = res && len - 1 == map.len();
+      }
+      res
+    }
+
+    fn remove_alien(orig: BTreeMap<i16, i16>) -> bool {
+      let mut map = OrdMap::<i16, i16>::from(orig.clone());
+      let mut res = true;
+      for key in orig.keys() {
+        let len = map.len();
+        res = orig.get(key) == map.get(key)
+        && orig.get(key).cloned() == map.remove(key)
+        && None == map.get(key)
+        && len - 1 == map.len()
+      }
+      res
+    }
+
+    fn delete_and_reinsert(
+      input: BTreeMap<i16, i16>,
+      index_rand: usize
+    ) -> bool {
+      if input.len() == 0 {
+        return true;
+      }
+
+      let index = *input.keys().nth(index_rand % input.len()).unwrap();
+      let map1 = OrdMap::from_iter(input.clone());
+      let (val, map2): (i16, _) = map1.extract(&index).unwrap();
+      let map3 = map2.update(index, val);
+      let mut res = true;
+      for key in map2.keys() {
+        res = res && *key != index;
+      }
+      res
+        && map1.len() == map2.len() + 1
+        && map1 == map3
+    }
+
+    fn exact_size_iterator(m: OrdMap<i16, i16>) -> bool {
+      let mut should_be = m.len();
+      let mut it = m.iter();
+      let mut res = true;
+      loop {
+        res = res && should_be == it.len();
+        match it.next() {
+          None => break,
+          Some(_) => should_be -= 1,
+        }
+      }
+      res && 0 == it.len()
+    }
+
+    fn diff_all_values(a: Vec<(usize, usize)>, b: Vec<(usize, usize)>) -> bool {
+      let a: OrdMap<usize, usize> = OrdMap::from(a);
+      let b: OrdMap<usize, usize> = OrdMap::from(b);
+
+      let diff: Vec<_> = a.diff(&b).collect();
+      let union = b.clone().union(a.clone());
+      let expected: Vec<_> = union.iter().filter_map(|(k, v)| {
+        if a.contains_key(&k) {
+          if b.contains_key(&k) {
+            let old = a.get(&k).unwrap();
+            if old != v	{
+              Some(DiffItem::Update {
+                old: (k, old),
+                new: (k, v),
+              })
+            } else {
+              None
+            }
+          } else {
+            Some(DiffItem::Remove(k, v))
           }
-      }
-
-      #[test]
-      fn insert_and_delete_values(
-          ref input in ord_map(0usize..64, 0usize..64, 1..1000),
-          ref ops in collection::vec((bool::ANY, usize::ANY, usize::ANY), 1..1000)
-      ) {
-          let mut map = input.clone();
-          let mut tree: collections::BTreeMap<usize, usize> = input.iter().map(|(k, v)| (*k, *v)).collect();
-          for (ins, key, val) in ops {
-              if *ins {
-                  tree.insert(*key, *val);
-                  map = map.update(*key, *val)
-              } else {
-                  tree.remove(key);
-                  map = map.without(key)
-              }
-          }
-          assert!(map.iter().map(|(k, v)| (*k, *v)).eq(tree.iter().map(|(k, v)| (*k, *v))));
-      }
-
-      #[test]
-      fn proptest_works(ref m in ord_map(0..9999, ".*", 10..100)) {
-          assert!(m.len() < 100);
-          assert!(m.len() >= 10);
-      }
-
-      #[test]
-      fn insert_and_length(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let mut map: OrdMap<i16, i16> = OrdMap::new();
-          for (k, v) in m.iter() {
-              map = map.update(*k, *v)
-          }
-          assert_eq!(m.len(), map.len());
-      }
-
-      #[test]
-      fn from_iterator(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          assert_eq!(m.len(), map.len());
-      }
-
-      #[test]
-      fn iterate_over(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          assert_eq!(m.len(), map.iter().count());
-      }
-
-      #[test]
-      fn equality(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map1: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          let map2: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          assert_eq!(map1, map2);
-      }
-
-      #[test]
-      fn lookup(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-          let map: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          for (k, v) in m.iter() {
-              assert_eq!(Some(*v), map.get(k).cloned());
-          }
-      }
-
-      #[test]
-      fn remove(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-          let mut map: OrdMap<i16, i16> =
-              FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-          for k in m.keys() {
-              let l = map.len();
-              assert_eq!(m.get(k).cloned(), map.get(k).cloned());
-              map = map.without(k);
-              assert_eq!(None, map.get(k));
-              assert_eq!(l - 1, map.len());
-          }
-      }
-
-      #[test]
-      fn insert_mut(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-          let mut mut_map = OrdMap::new();
-          let mut map = OrdMap::new();
-          for (k, v) in m.iter() {
-              map = map.update(*k, *v);
-              mut_map.insert(*k, *v);
-          }
-          assert_eq!(map, mut_map);
-      }
-
-      #[test]
-      fn remove_mut(ref orig in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-          let mut map = orig.clone();
-          for key in orig.keys() {
-              let len = map.len();
-              assert_eq!(orig.get(key), map.get(key));
-              assert_eq!(orig.get(key).cloned(), map.remove(key));
-              assert_eq!(None, map.get(key));
-              assert_eq!(len - 1, map.len());
-          }
-      }
-
-      #[test]
-      fn remove_alien(ref orig in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-          let mut map = OrdMap::<i16, i16>::from(orig.clone());
-          for key in orig.keys() {
-              let len = map.len();
-              assert_eq!(orig.get(key), map.get(key));
-              assert_eq!(orig.get(key).cloned(), map.remove(key));
-              assert_eq!(None, map.get(key));
-              assert_eq!(len - 1, map.len());
-          }
-      }
-
-      #[test]
-      fn delete_and_reinsert(
-          ref input in collection::hash_map(i16::ANY, i16::ANY, 1..1000),
-          index_rand in usize::ANY
-      ) {
-          let index = *input.keys().nth(index_rand % input.len()).unwrap();
-          let map1 = OrdMap::from_iter(input.clone());
-          let (val, map2): (i16, _) = map1.extract(&index).unwrap();
-          let map3 = map2.update(index, val);
-          for key in map2.keys() {
-              assert!(*key != index);
-          }
-          assert_eq!(map1.len(), map2.len() + 1);
-          assert_eq!(map1, map3);
-      }
-
-      #[test]
-      fn exact_size_iterator(ref m in ord_map(i16::ANY, i16::ANY, 1..1000)) {
-          let mut should_be = m.len();
-          let mut it = m.iter();
-          loop {
-              assert_eq!(should_be, it.len());
-              match it.next() {
-                  None => break,
-                  Some(_) => should_be -= 1,
-              }
-          }
-          assert_eq!(0, it.len());
-      }
-
-      #[test]
-      fn diff_all_values(a in collection::vec((usize::ANY, usize::ANY), 1..1000), b in collection::vec((usize::ANY, usize::ANY), 1..1000)) {
-          let a: OrdMap<usize, usize> = OrdMap::from(a);
-          let b: OrdMap<usize, usize> = OrdMap::from(b);
-
-          let diff: Vec<_> = a.diff(&b).collect();
-          let union = b.clone().union(a.clone());
-          let expected: Vec<_> = union.iter().filter_map(|(k, v)| {
-              if a.contains_key(&k) {
-                  if b.contains_key(&k) {
-                      let old = a.get(&k).unwrap();
-                      if old != v	{
-                          Some(DiffItem::Update {
-                              old: (k, old),
-                              new: (k, v),
-                          })
-                      } else {
-                          None
-                      }
-                  } else {
-                      Some(DiffItem::Remove(k, v))
-                  }
-              } else {
-                  Some(DiffItem::Add(k, v))
-              }
-          }).collect();
-          assert_eq!(expected, diff);
-      }
+        } else {
+          Some(DiffItem::Add(k, v))
+        }
+      }).collect();
+      expected == diff
+    }
   }
 }

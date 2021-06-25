@@ -238,6 +238,40 @@ impl<A> ConsList<A> {
         }
     }
 
+    /// Get the two first elements and the tail of a list.
+    ///
+    /// This function performs both the [`head`][head] function twice and
+    /// the [`tail`][tail] function in one go, returning a tuple of
+    /// the double head and the tail, or [`None`][None] if the list is empty.
+    ///
+    /// # Examples
+    ///
+    /// This can be useful when pattern matching your way through a
+    /// list:
+    ///
+    /// ```
+    /// # #[macro_use] extern crate sp_im;
+    /// # use sp_im::conslist::{ConsList, cons};
+    /// # use std::fmt::Debug;
+    /// fn walk_through_list<A>(list: &ConsList<A>)
+    /// where A: Debug {
+    ///   match list.uncons2() {
+    ///     None => (),
+    ///     Some((ref head, ref head2, ref tail)) => {
+    ///       print!("{:?} {:?}", head, head2);
+    ///       walk_through_list(tail)
+    ///     }
+    ///   }
+    /// }
+    /// # fn main() {
+    /// # }
+    /// ```
+    ///
+    /// Time: O(1)
+    ///
+    /// [head]: #method.head
+    /// [tail]: #method.tail
+    /// [None]: https://doc.rust-lang.org/core/option/enum.Option.html#variant.None
     pub fn uncons2(&self) -> Option<(Arc<A>, Arc<A>, ConsList<A>)> {
         self.uncons()
             .and_then(|(a1, d)| d.uncons().map(|(a2, d)| (a1, a2, d)))
@@ -407,6 +441,7 @@ impl<A> ConsList<A> {
         merge_all(&sequences(self, &cmp), &cmp)
     }
 
+    /// Compare the Arc pointers of two ConsList
     pub fn ptr_eq(&self, other: &Self) -> bool {
         Arc::ptr_eq(&self.0, &other.0)
     }
@@ -629,6 +664,7 @@ where
 
 // Iterators
 
+/// An iterator for ConsList
 pub struct Iter<A> {
     #[doc(hidden)]
     current: ConsList<A>,
@@ -719,55 +755,58 @@ where
 
 // QuickCheck
 
-#[cfg(any(test, feature = "quickcheck"))]
-use quickcheck::{Arbitrary, Gen};
+// #[cfg(any(test))]
+// use arbitrary::{Arbitrary};
+#[cfg(any(test))]
+use quickcheck::{Gen, Arbitrary};
 
 #[cfg(any(test, feature = "quickcheck"))]
 impl<A: Arbitrary + Sync> Arbitrary for ConsList<A> {
-    fn arbitrary<G: Gen>(g: &mut G) -> Self {
+    fn arbitrary(g: &mut Gen) -> Self {
         ConsList::from(Vec::<A>::arbitrary(g))
     }
 }
 
 // Proptest
 
-#[cfg(any(test, feature = "proptest"))]
-pub mod proptest {
-    use super::*;
-    use ::proptest::strategy::{BoxedStrategy, Strategy, ValueTree};
-    use sp_std::ops::Range;
+//#[cfg(any(test, feature = "proptest"))]
+//pub mod proptest {
+//    use super::*;
+//    use ::proptest::strategy::{BoxedStrategy, Strategy, ValueTree};
+//    use sp_std::ops::Range;
 
-    /// A strategy for a cons list of a given size.
-    ///
-    /// # Examples
-    ///
-    /// ```rust,ignore
-    /// proptest! {
-    ///     #[test]
-    ///     fn proptest_a_conslist(ref l in conslist(".*", 10..100)) {
-    ///         assert!(l.len() < 100);
-    ///         assert!(l.len() >= 10);
-    ///     }
-    /// }
-    /// ```
-    pub fn conslist<A: Strategy + 'static>(
-        element: A,
-        size: Range<usize>,
-    ) -> BoxedStrategy<ConsList<<A::Value as ValueTree>::Value>> {
-        ::proptest::collection::vec(element, size.clone())
-            .prop_map(ConsList::from)
-            .boxed()
-    }
-}
+//    /// A strategy for a cons list of a given size.
+//    ///
+//    /// # Examples
+//    ///
+//    /// ```rust,ignore
+//    /// proptest! {
+//    ///     #[test]
+//    ///     fn proptest_a_conslist(ref l in conslist(".*", 10..100)) {
+//    ///         assert!(l.len() < 100);
+//    ///         assert!(l.len() >= 10);
+//    ///     }
+//    /// }
+//    /// ```
+//    pub fn conslist<A: Strategy + 'static>(
+//        element: A,
+//        size: Range<usize>,
+//    ) -> BoxedStrategy<ConsList<<A::Value as ValueTree>::Value>> {
+//        ::proptest::collection::vec(element, size.clone())
+//            .prop_map(ConsList::from)
+//            .boxed()
+//    }
+//}
 
 // Tests
 
 #[cfg(test)]
 mod test {
-    use super::{proptest::*, *};
+    // use super::{proptest::*, *};
+    use super::*;
     use crate::test::is_sorted;
-    use ::proptest::*;
-    use alloc::string::String;
+    // use ::proptest::*;
+    use sp_std::alloc::string::String;
     use quickcheck::quickcheck;
 
     #[test]
@@ -831,11 +870,11 @@ mod test {
         }
     }
 
-    proptest! {
-        #[test]
-        fn proptest_a_conslist(ref l in conslist(".*", 10..100)) {
-            assert!(l.len() < 100);
-            assert!(l.len() >= 10);
-        }
-    }
+    // proptest! {
+    //     #[test]
+    //     fn proptest_a_conslist(ref l in conslist(".*", 10..100)) {
+    //         assert!(l.len() < 100);
+    //         assert!(l.len() >= 10);
+    //     }
+    // }
 }

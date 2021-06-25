@@ -79,8 +79,8 @@ use crate::{
 /// the scenes, so the performance of the two should be identical.
 ///
 /// ```rust
-/// # #[macro_use] extern crate im;
-/// # use im::vector::Vector;
+/// # #[macro_use] extern crate sp_im;
+/// # use sp_im::vector::Vector;
 /// # use std::iter::FromIterator;
 /// let mut vec: Vector<i64> = Vector::from_iter(0..1000);
 ///
@@ -184,8 +184,8 @@ where A: Clone + 'a
   /// ## Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::vector::Vector;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::vector::Vector;
   /// # use std::iter::FromIterator;
   /// let vec = Vector::from_iter(0..1000);
   /// let narrowed = vec.focus().narrow(100..200);
@@ -222,8 +222,8 @@ where A: Clone + 'a
   /// ## Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::vector::Vector;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::vector::Vector;
   /// # use std::iter::FromIterator;
   /// let vec = Vector::from_iter(0..1000);
   /// let (left, right) = vec.focus().split_at(500);
@@ -428,8 +428,8 @@ where A: Clone
 /// on the structure of the vector not changing while it exists.
 ///
 /// ```rust,compile_fail
-/// # #[macro_use] extern crate im;
-/// # use im::vector::Vector;
+/// # #[macro_use] extern crate sp_im;
+/// # use sp_im::vector::Vector;
 /// # use std::iter::FromIterator;
 /// let mut vec = Vector::from_iter(0..1000);
 /// let focus1 = vec.focus_mut();
@@ -445,8 +445,8 @@ where A: Clone
 /// which is safe because they can't overlap:
 ///
 /// ```rust
-/// # #[macro_use] extern crate im;
-/// # use im::vector::Vector;
+/// # #[macro_use] extern crate sp_im;
+/// # use sp_im::vector::Vector;
 /// # use std::iter::FromIterator;
 /// let mut vec = Vector::from_iter(0..1000);
 /// let focus = vec.focus_mut();
@@ -459,8 +459,8 @@ where A: Clone
 /// were created from goes out of scope.
 ///
 /// ```rust,compile_fail
-/// # #[macro_use] extern crate im;
-/// # use im::vector::Vector;
+/// # #[macro_use] extern crate sp_im;
+/// # use sp_im::vector::Vector;
 /// # use std::iter::FromIterator;
 /// let mut vec = Vector::from_iter(0..1000);
 /// let (left, right) = {
@@ -566,8 +566,8 @@ where A: Clone + 'a
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::vector::Vector;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::vector::Vector;
   /// # use std::iter::FromIterator;
   /// let mut vec = vector![1, 2, 3, 4, 5];
   /// vec.focus_mut().pair(1, 3, |a, b| *a += *b);
@@ -594,8 +594,8 @@ where A: Clone + 'a
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::vector::Vector;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::vector::Vector;
   /// # use std::iter::FromIterator;
   /// let mut vec = vector![1, 2, 3, 4, 5];
   /// vec.focus_mut().triplet(0, 2, 4, |a, b, c| *a += *b + *c);
@@ -641,8 +641,8 @@ where A: Clone + 'a
   /// ## Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::vector::Vector;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::vector::Vector;
   /// # use std::iter::FromIterator;
   /// let mut vec = Vector::from_iter(0..1000);
   /// let narrowed = vec.focus_mut().narrow(100..200);
@@ -679,8 +679,8 @@ where A: Clone + 'a
   /// ## Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::vector::Vector;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::vector::Vector;
   /// # use std::iter::FromIterator;
   /// let mut vec = Vector::from_iter(0..1000);
   /// {
@@ -817,7 +817,7 @@ where A: Clone + 'a
 
   fn set_focus(&mut self, pool: &RRBPool<A>, index: usize) {
     let mut tree = self.tree.lock().expect(
-      "im::vector::Focus::set_focus: unable to acquire exclusive lock on \
+      "sp_im::vector::Focus::set_focus: unable to acquire exclusive lock on \
        Vector",
     );
     if index < self.middle_range.start {

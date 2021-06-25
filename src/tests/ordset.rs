@@ -4,20 +4,39 @@ use std::collections::BTreeSet;
 use std::fmt::{Debug, Error, Formatter, Write};
 
 use crate::OrdSet;
+use rand::Rng;
 
-use proptest::proptest;
-use proptest_derive::Arbitrary;
+use quickcheck::{
+  Arbitrary,
+  Gen,
+};
 
-#[derive(Arbitrary, Debug)]
+#[derive(Debug, Clone)]
 enum Action<A> {
     Insert(A),
     Remove(A),
 }
 
-#[derive(Arbitrary)]
+#[derive(Clone)]
 struct Actions<A>(Vec<Action<A>>)
 where
     A: Ord + Clone;
+
+impl<A: Arbitrary + Ord> Arbitrary for Action<A> {
+  fn arbitrary(g: &mut Gen) -> Self {
+    let mut rng = rand::thread_rng();
+    match rng.gen_range(0..=1) {
+      0 => Action::Insert(A::arbitrary(g)),
+      _ => Action::Remove(A::arbitrary(g)),
+    }
+  }
+}
+
+impl<A: Arbitrary + Ord> Arbitrary for Actions<A> {
+  fn arbitrary(g: &mut Gen) -> Self {
+    Actions(Vec::<Action<A>>::arbitrary(g))
+  }
+}
 
 impl<A> Debug for Actions<A>
 where
@@ -49,37 +68,38 @@ where
     }
 }
 
-proptest! {
-    #[test]
-    fn comprehensive(actions: Actions<u8>) {
-        let mut set = OrdSet::new();
-        let mut nat = BTreeSet::new();
-        for action in actions.0 {
-            match action {
-                Action::Insert(value) => {
-                    let len = nat.len() + if nat.contains(&value) {
-                        0
-                    } else {
-                        1
-                    };
-                    nat.insert(value);
-                    set.insert(value);
-                    assert_eq!(len, set.len());
-                }
-                Action::Remove(value) => {
-                    let len = nat.len() - if nat.contains(&value) {
-                        1
-                    } else {
-                        0
-                    };
-                    nat.remove(&value);
-                    set.remove(&value);
-                    assert_eq!(len, set.len());
-                }
-            }
-            assert_eq!(nat.len(), set.len());
-            assert_eq!(OrdSet::from(nat.clone()), set);
-            assert!(nat.iter().eq(set.iter()));
+quickcheck! {
+  fn comprehensive(actions: Actions<u8>) -> bool {
+    let mut set = OrdSet::new();
+    let mut nat = BTreeSet::new();
+    let mut res = true;
+    for action in actions.0 {
+      match action {
+        Action::Insert(value) => {
+          let len = nat.len() + if nat.contains(&value) {
+            0
+          } else {
+            1
+          };
+          nat.insert(value);
+          set.insert(value);
+          res = res && len == set.len();
         }
+        Action::Remove(value) => {
+          let len = nat.len() - if nat.contains(&value) {
+            1
+          } else {
+            0
+          };
+          nat.remove(&value);
+          set.remove(&value);
+          res = res && len == set.len();
+        }
+      }
+      res = res && nat.len() == set.len()
+      && OrdSet::from(nat.clone()) == set
+      && nat.iter().eq(set.iter());
     }
+    res
+  }
 }

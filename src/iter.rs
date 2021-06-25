@@ -14,9 +14,9 @@
 ///
 /// # Examples
 /// ```
-/// # #[macro_use] extern crate im;
-/// # use im::iter::unfold;
-/// # use im::vector::Vector;
+/// # #[macro_use] extern crate sp_im;
+/// # use sp_im::iter::unfold;
+/// # use sp_im::vector::Vector;
 /// # use sp_std::iter::FromIterator;
 /// // Create an infinite stream of numbers, starting at 0.
 /// let mut it = unfold(0, |i| Some((i, i + 1)));

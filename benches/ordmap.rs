@@ -4,7 +4,7 @@
 
 #![feature(test)]
 
-extern crate im;
+extern crate sp_im;
 extern crate rand;
 extern crate test;
 
@@ -13,7 +13,7 @@ use std::collections::BTreeSet;
 use std::iter::FromIterator;
 use test::Bencher;
 
-use im::ordmap::OrdMap;
+use sp_im::ordmap::OrdMap;
 
 fn random_keys(size: usize) -> Vec<i64> {
     let mut gen = SmallRng::from_entropy();
