@@ -2279,50 +2279,28 @@ mod test {
       }
       res
     }
+
+    fn delete_values(vec: Vec<(usize, usize)>) -> bool {
+      if vec.len() == 0 {
+        return true;
+      }
+
+      let mut rng = thread_rng();
+      let index = vec.choose(&mut rng).unwrap().0;
+      let map1: OrdMap<usize, usize> = OrdMap::from_iter(vec.clone());
+      let map2 = map1.without(&index);
+      let mut res = true;
+      res = res && map1.len() == map2.len() + 1;
+      for k in map2.keys() {
+        res = res && *k != index;
+      }
+      res
+    }
   }
 
   // proptest! {
-  //     #[test]
-  //     fn length(ref input in collection::btree_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
-  //         assert_eq!(input.len(), map.len());
-  //     }
 
   //     #[test]
-  //     fn order(ref input in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let map: OrdMap<i32, i32> = OrdMap::from(input.clone());
-  //         assert!(is_sorted(map.keys()));
-  //     }
-
-  //     #[test]
-  //     fn overwrite_values(ref vec in collection::vec((i16::ANY, i16::ANY), 1..1000), index_rand in usize::ANY, new_val in i16::ANY) {
-  //         let index = vec[index_rand % vec.len()].0;
-  //         let map1 = OrdMap::from_iter(vec.clone());
-  //         let map2 = map1.update(index, new_val);
-  //         for (k, v) in map2 {
-  //             if k == index {
-  //                 assert_eq!(v, new_val);
-  //             } else {
-  //                 match map1.get(&k) {
-  //                     None => panic!("map1 didn't have key {:?}", k),
-  //                     Some(other_v) => {
-  //                         assert_eq!(v, *other_v);
-  //                     }
-  //                 }
-  //             }
-  //         }
-  //     }
-
-  //     #[test]
-  //     fn delete_values(ref vec in collection::vec((usize::ANY, usize::ANY), 1..1000), index_rand in usize::ANY) {
-  //         let index = vec[index_rand % vec.len()].0;
-  //         let map1: OrdMap<usize, usize> = OrdMap::from_iter(vec.clone());
-  //         let map2 = map1.without(&index);
-  //         assert_eq!(map1.len(), map2.len() + 1);
-  //         for k in map2.keys() {
-  //             assert_ne!(*k, index);
-  //         }
-  //     }
 
   //     #[test]
   //     fn insert_and_delete_values(
