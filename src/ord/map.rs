@@ -1968,12 +1968,12 @@ where
   }
 }
 
-impl<K: Ord, V, RK, RV> From<btree_map::BTreeMap<RK, RV>> for OrdMap<K, V>
+impl<K: Ord, V, RK, RV> From<BTreeMap<RK, RV>> for OrdMap<K, V>
 where
   K: Ord + Clone + From<RK>,
   V: Clone + From<RV>,
 {
-  fn from(m: btree_map::BTreeMap<RK, RV>) -> OrdMap<K, V> {
+  fn from(m: BTreeMap<RK, RV>) -> OrdMap<K, V> {
     m.into_iter().collect()
   }
 }

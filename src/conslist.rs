@@ -238,6 +238,40 @@ impl<A> ConsList<A> {
         }
     }
 
+    /// Get the two first elements and the tail of a list.
+    ///
+    /// This function performs both the [`head`][head] function twice and
+    /// the [`tail`][tail] function in one go, returning a tuple of
+    /// the double head and the tail, or [`None`][None] if the list is empty.
+    ///
+    /// # Examples
+    ///
+    /// This can be useful when pattern matching your way through a
+    /// list:
+    ///
+    /// ```
+    /// # #[macro_use] extern crate sp_im;
+    /// # use sp_im::conslist::{ConsList, cons};
+    /// # use std::fmt::Debug;
+    /// fn walk_through_list<A>(list: &ConsList<A>)
+    /// where A: Debug {
+    ///   match list.uncons2() {
+    ///     None => (),
+    ///     Some((ref head, ref head2, ref tail)) => {
+    ///       print!("{:?} {:?}", head, head2);
+    ///       walk_through_list(tail)
+    ///     }
+    ///   }
+    /// }
+    /// # fn main() {
+    /// # }
+    /// ```
+    ///
+    /// Time: O(1)
+    ///
+    /// [head]: #method.head
+    /// [tail]: #method.tail
+    /// [None]: https://doc.rust-lang.org/core/option/enum.Option.html#variant.None
     pub fn uncons2(&self) -> Option<(Arc<A>, Arc<A>, ConsList<A>)> {
         self.uncons()
             .and_then(|(a1, d)| d.uncons().map(|(a2, d)| (a1, a2, d)))
@@ -407,6 +441,7 @@ impl<A> ConsList<A> {
         merge_all(&sequences(self, &cmp), &cmp)
     }
 
+    /// Compare the Arc pointers of two ConsList
     pub fn ptr_eq(&self, other: &Self) -> bool {
         Arc::ptr_eq(&self.0, &other.0)
     }
@@ -629,6 +664,7 @@ where
 
 // Iterators
 
+/// An iterator for ConsList
 pub struct Iter<A> {
     #[doc(hidden)]
     current: ConsList<A>,
