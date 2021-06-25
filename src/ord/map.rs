@@ -2402,71 +2402,68 @@ mod test {
       }
       res
     }
+
+    fn delete_and_reinsert(
+      input: BTreeMap<i16, i16>,
+      index_rand: usize
+    ) -> bool {
+      if input.len() == 0 {
+        return true;
+      }
+
+      let index = *input.keys().nth(index_rand % input.len()).unwrap();
+      let map1 = OrdMap::from_iter(input.clone());
+      let (val, map2): (i16, _) = map1.extract(&index).unwrap();
+      let map3 = map2.update(index, val);
+      let mut res = true;
+      for key in map2.keys() {
+        res = res && *key != index;
+      }
+      res
+        && map1.len() == map2.len() + 1
+        && map1 == map3
+    }
+
+    fn exact_size_iterator(m: OrdMap<i16, i16>) -> bool {
+      let mut should_be = m.len();
+      let mut it = m.iter();
+      let mut res = true;
+      loop {
+        res = res && should_be == it.len();
+        match it.next() {
+          None => break,
+          Some(_) => should_be -= 1,
+        }
+      }
+      res && 0 == it.len()
+    }
+
+    fn diff_all_values(a: Vec<(usize, usize)>, b: Vec<(usize, usize)>) -> bool {
+      let a: OrdMap<usize, usize> = OrdMap::from(a);
+      let b: OrdMap<usize, usize> = OrdMap::from(b);
+
+      let diff: Vec<_> = a.diff(&b).collect();
+      let union = b.clone().union(a.clone());
+      let expected: Vec<_> = union.iter().filter_map(|(k, v)| {
+        if a.contains_key(&k) {
+          if b.contains_key(&k) {
+            let old = a.get(&k).unwrap();
+            if old != v	{
+              Some(DiffItem::Update {
+                old: (k, old),
+                new: (k, v),
+              })
+            } else {
+              None
+            }
+          } else {
+            Some(DiffItem::Remove(k, v))
+          }
+        } else {
+          Some(DiffItem::Add(k, v))
+        }
+      }).collect();
+      expected == diff
+    }
   }
-
-
-
-  //     #[test]
-
-  //     #[test]
-
-  //     #[test]
-  //     fn delete_and_reinsert(
-  //         ref input in collection::hash_map(i16::ANY, i16::ANY, 1..1000),
-  //         index_rand in usize::ANY
-  //     ) {
-  //         let index = *input.keys().nth(index_rand % input.len()).unwrap();
-  //         let map1 = OrdMap::from_iter(input.clone());
-  //         let (val, map2): (i16, _) = map1.extract(&index).unwrap();
-  //         let map3 = map2.update(index, val);
-  //         for key in map2.keys() {
-  //             assert!(*key != index);
-  //         }
-  //         assert_eq!(map1.len(), map2.len() + 1);
-  //         assert_eq!(map1, map3);
-  //     }
-
-  //     #[test]
-  //     fn exact_size_iterator(ref m in ord_map(i16::ANY, i16::ANY, 1..1000)) {
-  //         let mut should_be = m.len();
-  //         let mut it = m.iter();
-  //         loop {
-  //             assert_eq!(should_be, it.len());
-  //             match it.next() {
-  //                 None => break,
-  //                 Some(_) => should_be -= 1,
-  //             }
-  //         }
-  //         assert_eq!(0, it.len());
-  //     }
-
-  //     #[test]
-  //     fn diff_all_values(a in collection::vec((usize::ANY, usize::ANY), 1..1000), b in collection::vec((usize::ANY, usize::ANY), 1..1000)) {
-  //         let a: OrdMap<usize, usize> = OrdMap::from(a);
-  //         let b: OrdMap<usize, usize> = OrdMap::from(b);
-
-  //         let diff: Vec<_> = a.diff(&b).collect();
-  //         let union = b.clone().union(a.clone());
-  //         let expected: Vec<_> = union.iter().filter_map(|(k, v)| {
-  //             if a.contains_key(&k) {
-  //                 if b.contains_key(&k) {
-  //                     let old = a.get(&k).unwrap();
-  //                     if old != v	{
-  //                         Some(DiffItem::Update {
-  //                             old: (k, old),
-  //                             new: (k, v),
-  //                         })
-  //                     } else {
-  //                         None
-  //                     }
-  //                 } else {
-  //                     Some(DiffItem::Remove(k, v))
-  //                 }
-  //             } else {
-  //                 Some(DiffItem::Add(k, v))
-  //             }
-  //         }).collect();
-  //         assert_eq!(expected, diff);
-  //     }
-  // }
 }
