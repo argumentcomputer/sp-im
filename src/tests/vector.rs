@@ -5,9 +5,10 @@ use std::iter::FromIterator;
 use rand::Rng;
 use crate::Vector;
 
-// use proptest::proptest;
-// use arbitrary::Arbitrary;
-use quickcheck::Arbitrary;
+use quickcheck::{
+  Arbitrary,
+  Gen,
+};
 
 #[derive(Debug, Clone)]
 enum Action<A> {
@@ -27,7 +28,7 @@ enum Action<A> {
 struct Actions<A>(Vec<Action<A>>)
 where A: Clone;
 
-impl<A: quickcheck::Arbitrary> quickcheck::Arbitrary for Action<A> {
+impl<A: Arbitrary> Arbitrary for Action<A> {
   fn arbitrary(g: &mut quickcheck::Gen) -> Self {
     let mut rng = rand::thread_rng();
     match rng.gen_range(0..=9) {
@@ -46,8 +47,8 @@ impl<A: quickcheck::Arbitrary> quickcheck::Arbitrary for Action<A> {
   }
 }
 
-impl<A: quickcheck::Arbitrary> quickcheck::Arbitrary for Actions<A> {
-  fn arbitrary(g: &mut quickcheck::Gen) -> Self {
+impl<A: Arbitrary> Arbitrary for Actions<A> {
+  fn arbitrary(g: &mut Gen) -> Self {
     Actions(Vec::<Action<A>>::arbitrary(g))
   }
 }

@@ -21,10 +21,10 @@ use sp_std::{
   fmt,
   marker::PhantomData,
   ops::Deref,
-  hash::{
-    BuildHasher,
-  },
-  any::Any,
+  // hash::{
+  //   // BuildHasher,
+  // },
+  // any::Any,
 };
 
 use crate::{
@@ -265,16 +265,6 @@ impl<A: Clone + Serialize> Serialize for Vector<A> {
 #[cfg(test)]
 mod test {
   use super::*;
-  // use crate::proptest::{
-  //   ord_map,
-  //   ord_set,
-  //   vector,
-  // };
-  // use ::proptest::{
-  //   num::i32,
-  //   proptest,
-  // };
-  use ::arbitrary;
   use serde_json::{
     from_str,
     to_string,
@@ -294,22 +284,4 @@ mod test {
       v == from_str::<Vector<i32>>(&to_string(&v).unwrap()).unwrap()
     }
   }
-
-  // proptest! {
-  //     #[test]
-  //     fn ser_ordset(ref v in ord_set(i32::ANY, 0..100)) {
-  //         assert_eq!(v, &from_str::<OrdSet<i32>>(&to_string(&v).unwrap()).unwrap());
-  //     }
-
-  //     #[test]
-  //     fn ser_ordmap(ref v in ord_map(i32::ANY, i32::ANY, 0..100)) {
-  //         assert_eq!(v, &from_str::<OrdMap<i32, i32>>(&to_string(&v).unwrap()).unwrap());
-  //     }
-
-
-  //     #[test]
-  //     fn ser_vector(ref v in vector(i32::ANY, 0..100)) {
-  //         assert_eq!(v, &from_str::<Vector<i32>>(&to_string(&v).unwrap()).unwrap());
-  //     }
-  // }
 }

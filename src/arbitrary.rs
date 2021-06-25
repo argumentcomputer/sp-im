@@ -2,13 +2,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-use sp_std::{
-  hash::{
-    BuildHasher,
-    Hash,
-  },
-  iter,
-};
+// use sp_std::{
+//   hash::{
+//     // BuildHasher,
+//     // Hash,
+//   },
+//   // iter,
+// };
 
 use arbitrary::{
   size_hint,
@@ -25,9 +25,9 @@ use crate::{
   Vector,
 };
 
-fn empty<T: 'static>() -> Box<dyn Iterator<Item = T>> {
-  Box::new(iter::empty())
-}
+// fn empty<T: 'static>() -> Box<dyn Iterator<Item = T>> {
+//   Box::new(iter::empty())
+// }
 
 // fn shrink_collection<'a, T: Clone, A: Clone + Arbitrary<'a>>(
 //   entries: impl Iterator<Item = T>,

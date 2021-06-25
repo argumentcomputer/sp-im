@@ -193,11 +193,11 @@ where
 
 #[cfg(test)]
 mod test {
-  use super::*;
-  use crate::{
-    test::is_sorted,
+  // use super::*;
+  // use crate::{
+    // test::is_sorted,
     // vector::proptest::vector,
-  };
+  // };
   // use ::proptest::{
   //   num::i32,
   //   proptest,
