@@ -2328,71 +2328,72 @@ mod test {
         FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
       m.len() == map.len()
     }
+
+    fn iterate_over(m: BTreeMap<i16,i16>) -> bool {
+      let map: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      m.len() == map.iter().count()
+    }
+    
+    fn equality(m: BTreeMap<i16, i16>) -> bool {
+      let map1: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      let map2: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      map1 == map2
+    }
+
+    fn lookup(m: BTreeMap<i16, i16>) -> bool {
+      let map: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      for (k, v) in m.iter() {
+        if Some(*v) != map.get(k).cloned() {
+          return false;
+        }
+      }
+      true
+    }
+
+    fn remove(m: BTreeMap<i16, i16>) -> bool {
+      let mut map: OrdMap<i16, i16> =
+        FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
+      let mut res = true;
+      for k in m.keys() {
+        let l = map.len();
+        res = res && m.get(k).cloned() == map.get(k).cloned();
+        map = map.without(k);
+        res = res && None == map.get(k) && l - 1 == map.len();
+      }
+      res
+    }
+
+    fn insert_mut(m: BTreeMap<i16, i16>) -> bool {
+      let mut mut_map = OrdMap::new();
+      let mut map = OrdMap::new();
+      for (k, v) in m.iter() {
+        map = map.update(*k, *v);
+        mut_map.insert(*k, *v);
+      }
+      map == mut_map
+    }
+
+    fn remove_mut(orig: BTreeMap<i16, i16>) -> bool {
+      let mut map = orig.clone();
+      let mut res = true;
+      for key in orig.keys() {
+        let len = map.len();
+        res = res && orig.get(key) == map.get(key);
+        res = res && orig.get(key).cloned() == map.remove(key);
+        res = res && None == map.get(key);
+        res = res && len - 1 == map.len();
+      }
+      res
+    }
   }
 
 
-  //     #[test]
 
   //     #[test]
-  //     fn iterate_over(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let map: OrdMap<i16, i16> =
-  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-  //         assert_eq!(m.len(), map.iter().count());
-  //     }
-
-  //     #[test]
-  //     fn equality(ref m in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let map1: OrdMap<i16, i16> =
-  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-  //         let map2: OrdMap<i16, i16> =
-  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-  //         assert_eq!(map1, map2);
-  //     }
-
-  //     #[test]
-  //     fn lookup(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let map: OrdMap<i16, i16> =
-  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-  //         for (k, v) in m.iter() {
-  //             assert_eq!(Some(*v), map.get(k).cloned());
-  //         }
-  //     }
-
-  //     #[test]
-  //     fn remove(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let mut map: OrdMap<i16, i16> =
-  //             FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
-  //         for k in m.keys() {
-  //             let l = map.len();
-  //             assert_eq!(m.get(k).cloned(), map.get(k).cloned());
-  //             map = map.without(k);
-  //             assert_eq!(None, map.get(k));
-  //             assert_eq!(l - 1, map.len());
-  //         }
-  //     }
-
-  //     #[test]
-  //     fn insert_mut(ref m in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let mut mut_map = OrdMap::new();
-  //         let mut map = OrdMap::new();
-  //         for (k, v) in m.iter() {
-  //             map = map.update(*k, *v);
-  //             mut_map.insert(*k, *v);
-  //         }
-  //         assert_eq!(map, mut_map);
-  //     }
-
-  //     #[test]
-  //     fn remove_mut(ref orig in ord_map(i16::ANY, i16::ANY, 0..1000)) {
-  //         let mut map = orig.clone();
-  //         for key in orig.keys() {
-  //             let len = map.len();
-  //             assert_eq!(orig.get(key), map.get(key));
-  //             assert_eq!(orig.get(key).cloned(), map.remove(key));
-  //             assert_eq!(None, map.get(key));
-  //             assert_eq!(len - 1, map.len());
-  //         }
-  //     }
 
   //     #[test]
   //     fn remove_alien(ref orig in collection::hash_map(i16::ANY, i16::ANY, 0..1000)) {
