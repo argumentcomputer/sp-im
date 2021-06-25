@@ -92,14 +92,14 @@ where A: PartialEq
 
 impl<A> Eq for Rc<A> where A: Eq {}
 
-impl<A> std::fmt::Debug for Rc<A>
-where A: std::fmt::Debug
+impl<A> sp_std::fmt::Debug for Rc<A>
+where A: sp_std::fmt::Debug
 {
   #[inline(always)]
   fn fmt(
     &self,
-    f: &mut std::fmt::Formatter<'_>,
-  ) -> Result<(), std::fmt::Error> {
+    f: &mut sp_std::fmt::Formatter<'_>,
+  ) -> Result<(), sp_std::fmt::Error> {
     self.0.fmt(f)
   }
 }
@@ -165,14 +165,14 @@ where A: PartialEq
 
 impl<A> Eq for Arc<A> where A: Eq {}
 
-impl<A> std::fmt::Debug for Arc<A>
-where A: std::fmt::Debug
+impl<A> sp_std::fmt::Debug for Arc<A>
+where A: sp_std::fmt::Debug
 {
   #[inline(always)]
   fn fmt(
     &self,
-    f: &mut std::fmt::Formatter<'_>,
-  ) -> Result<(), std::fmt::Error> {
+    f: &mut sp_std::fmt::Formatter<'_>,
+  ) -> Result<(), sp_std::fmt::Error> {
     self.0.fmt(f)
   }
 }

@@ -10,6 +10,8 @@ use sp_std::{
     Bound,
     RangeBounds,
   },
+  vec,
+  vec::Vec,
 };
 
 use sized_chunks::Chunk;
@@ -1312,7 +1314,7 @@ where A: 'a + BTreeValue + PartialEq
         },
         (Some(old), Some(new)) => match (old, new) {
           (IterItem::Consider(old), IterItem::Consider(new)) => {
-            if !std::ptr::eq(old, new) {
+            if !sp_std::ptr::eq(old, new) {
               match old.keys[0].cmp_values(&new.keys[0]) {
                 Ordering::Less => {
                   Self::push(&mut self.old_stack, &old);

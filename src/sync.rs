@@ -5,8 +5,10 @@
 pub(crate) use self::lock::Lock;
 
 mod lock {
-  use std::sync::{
+  use sp_std::sync::{
     Arc,
+  };
+  use spin::mutex::{
     Mutex,
     MutexGuard,
   };
@@ -23,7 +25,7 @@ mod lock {
 
     #[inline]
     pub(crate) fn lock(&mut self) -> Option<MutexGuard<'_, A>> {
-      self.lock.lock().ok()
+      Some(self.lock.lock())
     }
   }
 

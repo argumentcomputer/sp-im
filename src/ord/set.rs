@@ -18,7 +18,10 @@
 //! [std::cmp::Ord]: https://doc.rust-lang.org/std/cmp/trait.Ord.html
 
 use sp_std::{
-  borrow::Borrow,
+  borrow::{
+    Borrow,
+    ToOwned,
+  },
   cmp::Ordering,
   collections::btree_set,
   fmt::{
@@ -41,6 +44,7 @@ use sp_std::{
     Mul,
     RangeBounds,
   },
+  vec::Vec,
 };
 
 #[cfg(has_specialisation)]
@@ -264,7 +268,7 @@ impl<A> OrdSet<A> {
   ///
   /// Time: O(1)
   pub fn ptr_eq(&self, other: &Self) -> bool {
-    std::ptr::eq(self, other) || PoolRef::ptr_eq(&self.root, &other.root)
+    sp_std::ptr::eq(self, other) || PoolRef::ptr_eq(&self.root, &other.root)
   }
 
   /// Get a reference to the memory pool used by this set.
