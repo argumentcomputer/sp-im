@@ -193,25 +193,20 @@ where
 
 #[cfg(test)]
 mod test {
-  // use super::*;
-  // use crate::{
-    // test::is_sorted,
-    // vector::proptest::vector,
-  // };
-  // use ::proptest::{
-  //   num::i32,
-  //   proptest,
-  // };
+  use super::*;
+  use crate::{
+    test::is_sorted,
+    vector::Vector,
+  };
 
-  // proptest! {
-  //     #[test]
-  //     fn test_quicksort(ref input in vector(i32::ANY, 0..10000)) {
-  //         let mut vec = input.clone();
-  //         let len = vec.len();
-  //         if len > 1 {
-  //             quicksort(vec.focus_mut(), &Ord::cmp);
-  //         }
-  //         assert!(is_sorted(vec));
-  //     }
-  // }
+  quickcheck! {
+    fn test_quicksort(input: Vector<i32>) -> bool {
+      let mut vec = input.clone();
+      let len = vec.len();
+      if len > 1 {
+        quicksort(vec.focus_mut(), &Ord::cmp);
+      }
+      is_sorted(vec)
+    }
+  }
 }
