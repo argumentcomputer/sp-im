@@ -2521,217 +2521,215 @@ mod test {
     }
   }
 
-  // proptest! {
-  //     #[test]
-  //     fn iter(ref vec in vec(i32::ANY, 0..1000)) {
-  //         let seq: Vector<i32> = Vector::from_iter(vec.iter().cloned());
-  //         for (index, item) in seq.iter().enumerate() {
-  //             assert_eq!(&vec[index], item);
-  //         }
-  //         assert_eq!(vec.len(), seq.len());
-  //     }
+  quickcheck! {
+    fn iter(vec: Vec<i32>) -> bool {
+      let seq: Vector<i32> = Vector::from_iter(vec.iter().cloned());
+      let mut res = true;
+      for (index, item) in seq.iter().enumerate() {
+        res = res && &vec[index] == item;
+      }
+      res && vec.len() == seq.len()
+    }
 
-  //     #[test]
-  //     fn push_front_mut(ref input in vec(i32::ANY, 0..1000)) {
-  //         let mut vector = Vector::new();
-  //         for (count, value) in input.iter().cloned().enumerate() {
-  //             assert_eq!(count, vector.len());
-  //             vector.push_front(value);
-  //             assert_eq!(count + 1, vector.len());
-  //         }
-  //         let input2 = Vec::from_iter(input.iter().rev().cloned());
-  //         assert_eq!(input2, Vec::from_iter(vector.iter().cloned()));
-  //     }
+    fn push_front_mut(input: Vec<i32>) -> bool {
+      let mut vector = Vector::new();
+      let mut res = true;
+      for (count, value) in input.iter().cloned().enumerate() {
+        res = res && count == vector.len();
+        vector.push_front(value);
+        res = res && count + 1 == vector.len();
+      }
+      let input2 = Vec::from_iter(input.iter().rev().cloned());
+      res && input2 == Vec::from_iter(vector.iter().cloned())
+    }
 
-  //     #[test]
-  //     fn push_back_mut(ref input in vec(i32::ANY, 0..1000)) {
-  //         let mut vector = Vector::new();
-  //         for (count, value) in input.iter().cloned().enumerate() {
-  //             assert_eq!(count, vector.len());
-  //             vector.push_back(value);
-  //             assert_eq!(count + 1, vector.len());
-  //         }
-  //         assert_eq!(input, &Vec::from_iter(vector.iter().cloned()));
-  //     }
+    fn push_back_mut(input: Vec<i32>) -> bool {
+      let mut vector = Vector::new();
+      let mut res = true;
+      for (count, value) in input.iter().cloned().enumerate() {
+        res = res && count == vector.len();
+        vector.push_back(value);
+        res = res && count + 1 == vector.len();
+      }
+      res && input == Vec::from_iter(vector.iter().cloned())
+    }
 
-  //     #[test]
-  //     fn pop_back_mut(ref input in vec(i32::ANY, 0..1000)) {
-  //         let mut vector = Vector::from_iter(input.iter().cloned());
-  //         assert_eq!(input.len(), vector.len());
-  //         for (index, value) in input.iter().cloned().enumerate().rev() {
-  //             match vector.pop_back() {
-  //                 None => panic!("vector emptied unexpectedly"),
-  //                 Some(item) => {
-  //                     assert_eq!(index, vector.len());
-  //                     assert_eq!(value, item);
-  //                 }
-  //             }
-  //         }
-  //         assert_eq!(0, vector.len());
-  //     }
+    fn pop_back_mut(input: Vec<i32>) -> bool {
+      let mut vector = Vector::from_iter(input.iter().cloned());
+      let mut res = true;
+      res = res && input.len() == vector.len();
+      for (index, value) in input.iter().cloned().enumerate().rev() {
+        match vector.pop_back() {
+          None => panic!("vector emptied unexpectedly"),
+          Some(item) => {
+            res = res && index == vector.len();
+            res = res && value == item;
+          }
+        }
+      }
+      res && 0 == vector.len()
+    }
 
-  //     #[test]
-  //     fn pop_front_mut(ref input in vec(i32::ANY, 0..1000)) {
-  //         let mut vector = Vector::from_iter(input.iter().cloned());
-  //         assert_eq!(input.len(), vector.len());
-  //         for (index, value) in input.iter().cloned().rev().enumerate().rev() {
-  //             match vector.pop_front() {
-  //                 None => panic!("vector emptied unexpectedly"),
-  //                 Some(item) => {
-  //                     assert_eq!(index, vector.len());
-  //                     assert_eq!(value, item);
-  //                 }
-  //             }
-  //         }
-  //         assert_eq!(0, vector.len());
-  //     }
+    fn pop_front_mut(input: Vec<i32>) -> bool {
+      let mut vector = Vector::from_iter(input.iter().cloned());
+      let mut res = input.len() == vector.len();
+      for (index, value) in input.iter().cloned().rev().enumerate().rev() {
+        match vector.pop_front() {
+          None => panic!("vector emptied unexpectedly"),
+          Some(item) => {
+            res = res && index == vector.len()
+            && value == item;
+          }
+        }
+      }
+      res && 0 == vector.len()
+    }
 
-  //     // #[test]
-  //     // fn push_and_pop(ref input in vec(i32::ANY, 0..1000)) {
-  //     //     let mut vector = Vector::new();
-  //     //     for (count, value) in input.iter().cloned().enumerate() {
-  //     //         assert_eq!(count, vector.len());
-  //     //         vector.push_back(value);
-  //     //         assert_eq!(count + 1, vector.len());
-  //     //     }
-  //     //     for (index, value) in input.iter().cloned().rev().enumerate().rev() {
-  //     //         match vector.pop_front() {
-  //     //             None => panic!("vector emptied unexpectedly"),
-  //     //             Some(item) => {
-  //     //                 assert_eq!(index, vector.len());
-  //     //                 assert_eq!(value, item);
-  //     //             }
-  //     //         }
-  //     //     }
-  //     //     assert_eq!(true, vector.is_empty());
-  //     // }
+    fn push_and_pop(input: Vec<i32>) -> bool {
+      let mut vector = Vector::new();
+      let mut res = true;
+      for (count, value) in input.iter().cloned().enumerate() {
+        res = res && count == vector.len();
+        vector.push_back(value);
+        res = res && count + 1 == vector.len();
+      }
+      for (index, value) in input.iter().cloned().rev().enumerate().rev() {
+        match vector.pop_front() {
+          None => panic!("vector emptied unexpectedly"),
+          Some(item) => {
+            res = res && index == vector.len();
+            res = res && value == item;
+          }
+        }
+      }
+      res && vector.is_empty()
+    }
 
-  //     #[test]
-  //     fn split(ref vec in vec(i32::ANY, 1..2000), split_pos in usize::ANY) {
-  //         let split_index = split_pos % (vec.len() + 1);
-  //         let mut left = Vector::from_iter(vec.iter().cloned());
-  //         let right = left.split_off(split_index);
-  //         assert_eq!(left.len(), split_index);
-  //         assert_eq!(right.len(), vec.len() - split_index);
-  //         for (index, item) in left.iter().enumerate() {
-  //             assert_eq!(& vec[index], item);
-  //         }
-  //         for (index, item) in right.iter().enumerate() {
-  //             assert_eq!(&vec[split_index + index], item);
-  //         }
-  //     }
+    fn split(vec: Vec<i32>) -> bool {
+      let split_index = rand::random::<usize>() % (vec.len() + 1);
+      let mut left = Vector::from_iter(vec.iter().cloned());
+      let right = left.split_off(split_index);
+      let mut res = true;
+      res = res && left.len() == split_index;
+      res = res && right.len() == vec.len() - split_index;
+      for (index, item) in left.iter().enumerate() {
+        res = res && &vec[index] == item;
+      }
+      for (index, item) in right.iter().enumerate() {
+        res = res && &vec[split_index + index] == item;
+      }
+      res
+    }
 
-  //     #[test]
-  //     fn append(ref vec1 in vec(i32::ANY, 0..1000), ref vec2 in vec(i32::ANY, 0..1000)) {
-  //         let mut seq1 = Vector::from_iter(vec1.iter().cloned());
-  //         let seq2 = Vector::from_iter(vec2.iter().cloned());
-  //         assert_eq!(seq1.len(), vec1.len());
-  //         assert_eq!(seq2.len(), vec2.len());
-  //         seq1.append(seq2);
-  //         let mut vec = vec1.clone();
-  //         vec.extend(vec2);
-  //         assert_eq!(seq1.len(), vec.len());
-  //         for (index, item) in seq1.into_iter().enumerate() {
-  //             assert_eq!(vec[index], item);
-  //         }
-  //     }
+    fn append(vec1: Vec<i32>, vec2: Vec<i32>) -> bool {
+      let mut seq1 = Vector::from_iter(vec1.iter().cloned());
+      let seq2 = Vector::from_iter(vec2.iter().cloned());
+      let mut res = true;
+      res = res && seq1.len() == vec1.len();
+      res = res && seq2.len() == vec2.len();
+      seq1.append(seq2);
+      let mut vec = vec1.clone();
+      vec.extend(vec2);
+      res = res && seq1.len() == vec.len();
+      for (index, item) in seq1.into_iter().enumerate() {
+        res = res && vec[index] == item;
+      }
+      res
+    }
 
-  //     #[test]
-  //     fn iter_mut(ref input in vector(i32::ANY, 0..10000)) {
-  //         let mut vec = input.clone();
-  //         {
-  //             for p in vec.iter_mut() {
-  //                 *p = p.overflowing_add(1).0;
-  //             }
-  //         }
-  //         let expected: Vector<i32> = input.clone().into_iter().map(|i| i.overflowing_add(1).0).collect();
-  //         assert_eq!(expected, vec);
-  //     }
+    fn iter_mut(input: Vector<i32>) -> bool {
+      let mut vec = input.clone();
+      {
+        for p in vec.iter_mut() {
+          *p = p.overflowing_add(1).0;
+        }
+      }
+      let expected: Vector<i32> = input.clone().into_iter().map(|i| i.overflowing_add(1).0).collect();
+      expected == vec
+    }
 
-  //     #[test]
-  //     fn focus(ref input in vector(i32::ANY, 0..10000)) {
-  //         let mut vec = input.clone();
-  //         {
-  //             let mut focus = vec.focus_mut();
-  //             for i in 0..input.len() {
-  //                 let p = focus.index_mut(i);
-  //                 *p = p.overflowing_add(1).0;
-  //             }
-  //         }
-  //         let expected: Vector<i32> = input.clone().into_iter().map(|i| i.overflowing_add(1).0).collect();
-  //         assert_eq!(expected, vec);
-  //     }
+    fn focus(input: Vector<i32>) -> bool {
+      let mut vec = input.clone();
+      {
+        let mut focus = vec.focus_mut();
+        for i in 0..input.len() {
+          let p = focus.index_mut(i);
+          *p = p.overflowing_add(1).0;
+        }
+      }
+      let expected: Vector<i32> = input.clone().into_iter().map(|i| i.overflowing_add(1).0).collect();
+      expected == vec
+    }
 
-  //     #[test]
-  //     fn focus_mut_split(ref input in vector(i32::ANY, 0..10000)) {
-  //         let mut vec = input.clone();
+    fn focus_mut_split(input: Vector<i32>) -> bool {
+      let mut vec = input.clone();
 
-  //         fn split_down(focus: FocusMut<'_, i32>) {
-  //             let len = focus.len();
-  //             if len < 8 {
-  //                 for p in focus {
-  //                     *p = p.overflowing_add(1).0;
-  //                 }
-  //             } else {
-  //                 let (left, right) = focus.split_at(len / 2);
-  //                 split_down(left);
-  //                 split_down(right);
-  //             }
-  //         }
+      fn split_down(focus: FocusMut<'_, i32>) {
+        let len = focus.len();
+        if len < 8 {
+          for p in focus {
+            *p = p.overflowing_add(1).0;
+          }
+        } else {
+          let (left, right) = focus.split_at(len / 2);
+          split_down(left);
+          split_down(right);
+        }
+      }
 
-  //         split_down(vec.focus_mut());
+      split_down(vec.focus_mut());
 
-  //         let expected: Vector<i32> = input.clone().into_iter().map(|i| i.overflowing_add(1).0).collect();
-  //         assert_eq!(expected, vec);
-  //     }
+      let expected: Vector<i32> = input.clone().into_iter().map(|i| i.overflowing_add(1).0).collect();
+      expected == vec
+    }
 
-  //     #[test]
-  //     fn chunks(ref input in vector(i32::ANY, 0..10000)) {
-  //         let output: Vector<_> = input.leaves().flatten().cloned().collect();
-  //         assert_eq!(input, &output);
-  //         let rev_in: Vector<_> = input.iter().rev().cloned().collect();
-  //         let rev_out: Vector<_> = input.leaves().rev().map(|c| c.iter().rev()).flatten().cloned().collect();
-  //         assert_eq!(rev_in, rev_out);
-  //     }
+    fn chunks(input: Vector<i32>) -> bool {
+      let output: Vector<_> = input.leaves().flatten().cloned().collect();
+      let mut res = true;
+      res = res && input == output;
+      let rev_in: Vector<_> = input.iter().rev().cloned().collect();
+      let rev_out: Vector<_> = input.leaves().rev().map(|c| c.iter().rev()).flatten().cloned().collect();
+      res && rev_in == rev_out
+    }
 
-  //     #[test]
-  //     fn chunks_mut(ref mut input_src in vector(i32::ANY, 0..10000)) {
-  //         let mut input = input_src.clone();
-  //         #[allow(clippy::map_clone)]
-  //         let output: Vector<_> = input.leaves_mut().flatten().map(|v| *v).collect();
-  //         assert_eq!(input, output);
-  //         let rev_in: Vector<_> = input.iter().rev().cloned().collect();
-  //         let rev_out: Vector<_> = input.leaves_mut().rev().map(|c| c.iter().rev()).flatten().cloned().collect();
-  //         assert_eq!(rev_in, rev_out);
-  //     }
+    fn chunks_mut(input_src: Vector<i32>) -> bool {
+      let mut input = input_src.clone();
+      let mut res = true;
+      #[allow(clippy::map_clone)]
+      let output: Vector<_> = input.leaves_mut().flatten().map(|v| *v).collect();
+      res = res && input == output;
+      let rev_in: Vector<_> = input.iter().rev().cloned().collect();
+      let rev_out: Vector<_> = input.leaves_mut().rev().map(|c| c.iter().rev()).flatten().cloned().collect();
+      res && rev_in == rev_out
+    }
 
-  //     // The following two tests are very slow and there are unit tests above
-  //     // which test for regression of issue #55.  It would still be good to
-  //     // run them occasionally.
+    // The following two tests are very slow and there are unit tests above
+    // which test for regression of issue #55.  It would still be good to
+    // run them occasionally.
 
-  //     // #[test]
-  //     // fn issue55_back(count in 0..10000, slice_at in usize::ANY) {
-  //     //     let count = count as usize;
-  //     //     let slice_at = slice_at % count;
-  //     //     let mut l = Vector::unit(0);
-  //     //     for _ in 0..count {
-  //     //         let mut tmp = Vector::unit(0);
-  //     //         tmp.append(l);
-  //     //         l = tmp;
-  //     //     }
-  //     //     let len = l.len();
-  //     //     l.slice(slice_at..len);
-  //     // }
+    // #[test]
+    // fn issue55_back(count in 0..10000, slice_at in usize::ANY) {
+    //     let count = count as usize;
+    //     let slice_at = slice_at % count;
+    //     let mut l = Vector::unit(0);
+    //     for _ in 0..count {
+    //         let mut tmp = Vector::unit(0);
+    //         tmp.append(l);
+    //         l = tmp;
+    //     }
+    //     let len = l.len();
+    //     l.slice(slice_at..len);
+    // }
 
-  //     // #[test]
-  //     // fn issue55_fwd(count in 0..10000, slice_at in usize::ANY) {
-  //     //     let count = count as usize;
-  //     //     let slice_at = slice_at % count;
-  //     //     let mut l = Vector::new();
-  //     //     for i in 0..count {
-  //     //         l.append(Vector::unit(i));
-  //     //     }
-  //     //     assert_eq!(Some(&slice_at), l.get(slice_at));
-  //     // }
-  // }
+    // #[test]
+    // fn issue55_fwd(count in 0..10000, slice_at in usize::ANY) {
+    //     let count = count as usize;
+    //     let slice_at = slice_at % count;
+    //     let mut l = Vector::new();
+    //     for i in 0..count {
+    //         l.append(Vector::unit(i));
+    //     }
+    //     assert_eq!(Some(&slice_at), l.get(slice_at));
+    // }
+  }
 }
