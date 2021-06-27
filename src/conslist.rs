@@ -869,12 +869,4 @@ mod test {
             l.len() == sorted.len() && is_sorted(sorted)
         }
     }
-
-    // proptest! {
-    //     #[test]
-    //     fn proptest_a_conslist(ref l in conslist(".*", 10..100)) {
-    //         assert!(l.len() < 100);
-    //         assert!(l.len() >= 10);
-    //     }
-    // }
 }
