@@ -4,7 +4,7 @@
 
 #![feature(test)]
 
-extern crate im;
+extern crate sp_im;
 extern crate rand;
 extern crate rayon;
 extern crate test;
@@ -14,7 +14,7 @@ use rand::Rng;
 use std::iter::FromIterator;
 use test::Bencher;
 
-use im::vector::Vector;
+use sp_im::vector::Vector;
 
 fn rando<A>() -> impl Iterator<Item = A>
 where

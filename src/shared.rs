@@ -23,6 +23,7 @@ use sp_std::sync::Arc;
 ///
 /// [sp_std::sync::Arc]: https://docs.rs/sp-std/3.0.0/sp_std/sync/struct.Arc.html
 pub trait Shared<A> {
+  /// Get a new Arc pointer for this value
   fn shared(self) -> Arc<A>;
 }
 

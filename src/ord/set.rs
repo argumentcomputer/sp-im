@@ -68,8 +68,8 @@ pub use crate::nodes::btree::DiffItem;
 /// # Examples
 ///
 /// ```
-/// # #[macro_use] extern crate im;
-/// # use im::ordset::OrdSet;
+/// # #[macro_use] extern crate sp_im;
+/// # use sp_im::ordset::OrdSet;
 /// # fn main() {
 /// assert_eq!(ordset![1, 2, 3], OrdSet::from(vec![1, 2, 3]));
 /// # }
@@ -210,8 +210,8 @@ impl<A> OrdSet<A> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// let set = OrdSet::unit(123);
   /// assert!(set.contains(&123));
   /// ```
@@ -230,8 +230,8 @@ impl<A> OrdSet<A> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// assert!(!ordset![1, 2, 3].is_empty());
   /// assert!(OrdSet::<i32>::new().is_empty());
   /// ```
@@ -246,8 +246,8 @@ impl<A> OrdSet<A> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// assert_eq!(3, ordset![1, 2, 3].len());
   /// ```
   #[inline]
@@ -284,8 +284,8 @@ impl<A> OrdSet<A> {
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdSet;
   /// let mut set = ordset![1, 2, 3];
   /// set.clear();
   /// assert!(set.is_empty());
@@ -356,8 +356,8 @@ where A: Ord
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// let mut set = ordset! {1, 2, 3};
   /// assert!(set.contains(&1));
   /// assert!(!set.contains(&4));
@@ -381,8 +381,8 @@ where A: Ord
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdSet;
   /// let set = ordset![1, 3, 5, 7, 9];
   /// assert_eq!(Some(&5), set.get_prev(&6));
   /// ```
@@ -401,8 +401,8 @@ where A: Ord
   /// # Examples
   ///
   /// ```rust
-  /// # #[macro_use] extern crate im;
-  /// # use im::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::OrdSet;
   /// let set = ordset![1, 3, 5, 7, 9];
   /// assert_eq!(Some(&5), set.get_next(&4));
   /// ```
@@ -447,8 +447,8 @@ where A: Ord + Clone
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// let mut set = ordset! {};
   /// set.insert(123);
   /// set.insert(456);
@@ -535,8 +535,8 @@ where A: Ord + Clone
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// let set = ordset![456];
   /// assert_eq!(set.update(123), ordset![123, 456]);
   /// ```
@@ -592,8 +592,8 @@ where A: Ord + Clone
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// let set1 = ordset! {1, 2};
   /// let set2 = ordset! {2, 3};
   /// let expected = ordset! {1, 2, 3};
@@ -626,8 +626,8 @@ where A: Ord + Clone
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// let set1 = ordset! {1, 2};
   /// let set2 = ordset! {2, 3};
   /// let expected = ordset! {1, 3};
@@ -647,8 +647,8 @@ where A: Ord + Clone
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// let set1 = ordset! {1, 2};
   /// let set2 = ordset! {2, 3};
   /// let expected = ordset! {1, 3};
@@ -672,8 +672,8 @@ where A: Ord + Clone
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// let set1 = ordset! {1, 2};
   /// let set2 = ordset! {2, 3};
   /// let expected = ordset! {1};
@@ -694,8 +694,8 @@ where A: Ord + Clone
   /// # Examples
   ///
   /// ```
-  /// # #[macro_use] extern crate im;
-  /// # use im::ordset::OrdSet;
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::ordset::OrdSet;
   /// let set1 = ordset! {1, 2};
   /// let set2 = ordset! {2, 3};
   /// let expected = ordset! {2};

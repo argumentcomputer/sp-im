@@ -2,10 +2,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-use metrohash::MetroHash64;
+// use metrohash::MetroHash64;
 use sp_std::{
   hash::{
-    BuildHasher,
+    // BuildHasher,
     Hasher,
   },
   marker::PhantomData,
@@ -61,18 +61,18 @@ impl<N: Unsigned> Default for LolHasher<N> {
   fn default() -> Self { LolHasher { state: 0, shift: 0, size: PhantomData } }
 }
 
-pub(crate) struct MetroHashBuilder {
-  seed: u64,
-}
+// pub(crate) struct MetroHashBuilder {
+//   seed: u64,
+// }
 
-impl MetroHashBuilder {
-  pub(crate) fn new(seed: u64) -> Self { MetroHashBuilder { seed } }
+// impl MetroHashBuilder {
+//   pub(crate) fn new(seed: u64) -> Self { MetroHashBuilder { seed } }
 
-  pub(crate) fn seed(&self) -> u64 { self.seed }
-}
+//   pub(crate) fn seed(&self) -> u64 { self.seed }
+// }
 
-impl BuildHasher for MetroHashBuilder {
-  type Hasher = MetroHash64;
+// impl BuildHasher for MetroHashBuilder {
+//   type Hasher = MetroHash64;
 
-  fn build_hasher(&self) -> Self::Hasher { MetroHash64::with_seed(self.seed) }
-}
+//   fn build_hasher(&self) -> Self::Hasher { MetroHash64::with_seed(self.seed) }
+// }
