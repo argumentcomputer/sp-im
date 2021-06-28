@@ -47,7 +47,6 @@ use sp_std::{
     IndexMut,
     RangeBounds,
   },
-  vec::Vec,
 };
 
 #[cfg(has_specialisation)]
