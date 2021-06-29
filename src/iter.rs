@@ -31,7 +31,7 @@
 pub fn unfold<F, S, A>(value: S, f: F) -> impl Iterator<Item = A>
 where F: Fn(S) -> Option<(A, S)> {
   let mut value = Some(value);
-  std::iter::from_fn(move || {
+  sp_std::iter::from_fn(move || {
     f(value.take().unwrap()).map(|(next, state)| {
       value = Some(state);
       next

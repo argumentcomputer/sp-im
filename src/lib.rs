@@ -333,6 +333,7 @@
 #![deny(unsafe_code, nonstandard_style)]
 #![warn(unreachable_pub, missing_docs)]
 #![cfg_attr(has_specialisation, feature(specialization))]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(test)]
 #[macro_use]

@@ -10,11 +10,12 @@ use sp_std::{
     Bound,
     RangeBounds,
   },
+  vec,
+  vec::Vec,
 };
 
 use sized_chunks::Chunk;
 use typenum::{
-  Add1,
   Unsigned,
 };
 
@@ -54,8 +55,8 @@ pub trait BTreeValue {
 }
 
 pub(crate) struct Node<A> {
-  keys: Chunk<A, NodeSize>,
-  children: Chunk<Option<PoolRef<Node<A>>>, Add1<NodeSize>>,
+  keys: Chunk<A, 64>,
+  children: Chunk<Option<PoolRef<Node<A>>>, 65>,
 }
 
 #[cfg(feature = "pool")]
@@ -1312,7 +1313,7 @@ where A: 'a + BTreeValue + PartialEq
         },
         (Some(old), Some(new)) => match (old, new) {
           (IterItem::Consider(old), IterItem::Consider(new)) => {
-            if !std::ptr::eq(old, new) {
+            if !sp_std::ptr::eq(old, new) {
               match old.keys[0].cmp_values(&new.keys[0]) {
                 Ordering::Less => {
                   Self::push(&mut self.old_stack, &old);

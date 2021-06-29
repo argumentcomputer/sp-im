@@ -20,18 +20,21 @@ path = "./src/lib.rs"
 version_check = "0.9"
 
 [features]
+std = []
 debug = []
 
 [dependencies]
 typenum = "1.12"
-bitmaps = "2"
-sized-chunks = "0.6"
-rand_core = "0.5.1"
+bitmaps = { version = "3", default-features = false }
+sized-chunks = { git = "https://github.com/yatima-inc/sized-chunks", branch = "master", default-features = false }
+#sized-chunks = { version = "0.6", default-features = false }
+rand_core = { version = "0.5.1", default-features = false }
 rand_xoshiro = "0.4"
 serde = { version="1", optional=true }
 rayon = { version="1", optional=true }
 refpool = { version="0.4", optional=true }
-sp-std = { version="3", default-features=false }
+sp-std = { version="3", default-features = false }
+spin = "0.9"
 
 [dev-dependencies]
 arbitrary = { version="1", features = ["derive"] }
