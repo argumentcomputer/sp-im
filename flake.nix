@@ -29,6 +29,7 @@
         buildInputs = with pkgs; [ ];
         targets = [ ];
         root = ./.;
+        copyLibs = true;
         remapPathPrefix =
           true; # remove nix store references for a smaller output package
       };
