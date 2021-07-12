@@ -24,7 +24,7 @@
 
       crateName = "sp-im";
 
-      project = naersk-lib.buildPackage {
+      project = args: naersk-lib.buildPackage {
         name = crateName;
         buildInputs = with pkgs; [ ];
         targets = [ ];
@@ -32,11 +32,13 @@
         copyLibs = true;
         remapPathPrefix =
           true; # remove nix store references for a smaller output package
-      };
+      } // args;
 
     in
     {
-      packages.${crateName} = project;
+      packages.${crateName} = project {};
+
+      checks.${crateName} = project { doCheck = true; };
 
       defaultPackage = self.packages.${system}.${crateName};
 

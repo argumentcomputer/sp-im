@@ -5,9 +5,7 @@ self: super:
 let
   fromTOML =
     # nix 2.1 added the fromTOML builtin
-    if builtins ? fromTOML
-    then builtins.fromTOML
-    else (import ./parseTOML.nix).fromTOML;
+    builtins.fromTOML;
 
   parseRustToolchain = file: with builtins;
     if file == null then
@@ -74,7 +72,7 @@ let
     pkgs ? ${pkgname}.target.${target};
 
   getTuples = pkgs: name: targets:
-    builtins.map (target: { inherit name target; }) (builtins.filter (target: hasTarget pkgs name target) targets);
+    builtins.map (target: { inherit name target; }) (builtins.filter (hasTarget pkgs name) targets);
 
   # In the manifest, a package might have different components which are bundled with it, as opposed as the extensions which can be added.
   # By default, a package will include the components for the same architecture, and offers them as extensions for other architectures.
@@ -92,11 +90,14 @@ let
     in
       tuples;
 
-  getFetchUrl = pkgs: pkgname: target: stdenv: fetchurl:
+  getFetchUrl = pkgs: pkgname: 
     let
       pkg = pkgs.${pkgname};
-      srcInfo = pkg.target.${target};
     in
+      target:
+      let
+        srcInfo = pkg.target.${target};
+      in  _stdenv: _fetchurl:
       (super.fetchurl { url = srcInfo.xz_url; sha256 = srcInfo.xz_hash; });
 
   checkMissingExtensions = pkgs: pkgname: stdenv: extensions:
@@ -253,7 +254,7 @@ let
   #                       All extensions in this list will be installed for the target architectures.
   #                       *Attention* If you want to install an extension like rust-src, that has no fixed architecture (arch *),
   #                       you will need to specify this extension in the extensions options or it will not be installed!
-  fromManifestFile = manifest: { stdenv, fetchurl, patchelf }:
+  fromManifestFile = manifest: { stdenv, fetchurl, ... }:
     let
       inherit (builtins) elemAt;
       inherit (super) makeOverridable;
@@ -267,7 +268,7 @@ let
           version = "${elemAt version' 0}-${elemAt version' 2}-${elemAt version' 1}";
           namesAndSrcs = getComponents pkgs.pkg name targets extensions targetExtensions stdenv fetchurl;
           components = installComponents stdenv namesAndSrcs;
-          componentsOuts = builtins.map (comp: (super.lib.strings.escapeNixString (super.lib.getOutput "out" comp))) components;
+          # componentsOuts = builtins.map (comp: (super.lib.strings.escapeNixString (super.lib.getOutput "out" comp))) components;
         in
           super.pkgs.symlinkJoin {
             name = name + "-" + version;
