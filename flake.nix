@@ -19,7 +19,7 @@
     {
       packages.${crateName} = buildRustProject { inherit root; };
 
-      checks.${crateName} = testRustProject { doCheck = true; inherit root; };
+      checks.${crateName} = testRustProject { doCheck = true; inherit root; cargoTestOptions = options: options ++ [ "--all-features" ];  };
 
       defaultPackage = self.packages.${system}.${crateName};
 
