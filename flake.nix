@@ -1,44 +1,25 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs";
-    utils.url = "github:numtide/flake-utils";
-    naersk.url = "github:nmattia/naersk";
+    utils.url = "github:yatima-inc/nix-utils";
   };
 
   outputs =
     { self
-    , nixpkgs
     , utils
-    , naersk
     }:
-    utils.lib.eachDefaultSystem (system:
+    utils.inputs.flake-utils.lib.eachDefaultSystem (system:
     let
-      lib = nixpkgs.lib;
-      overlays = [ (import ./nix/rust-overlay.nix) ];
-      pkgs = import nixpkgs { inherit system overlays;};
-      rust = import ./nix/rust.nix { nixpkgs = pkgs; };
-      naersk-lib = naersk.lib."${system}".override {
-        rustc = rust;
-        cargo = rust;
-      };
-
+      lib = utils.lib.${system};
+      pkgs = utils.nixpkgs.${system};
+      inherit (lib) buildRustProject testRustProject rustDefault filterRustProject;
+      rust = rustDefault;
       crateName = "sp-im";
-
-      project = args: naersk-lib.buildPackage {
-        name = crateName;
-        buildInputs = with pkgs; [ ];
-        targets = [ ];
-        root = ./.;
-        copyLibs = true;
-        remapPathPrefix =
-          true; # remove nix store references for a smaller output package
-      } // args;
-
+      root = ./.;
     in
     {
-      packages.${crateName} = project {};
+      packages.${crateName} = buildRustProject { inherit root; };
 
-      checks.${crateName} = project { doCheck = true; };
+      checks.${crateName} = testRustProject { doCheck = true; inherit root; };
 
       defaultPackage = self.packages.${system}.${crateName};
 
