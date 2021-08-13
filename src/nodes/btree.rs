@@ -16,6 +16,7 @@ use sp_std::{
 
 use sized_chunks::Chunk;
 use typenum::{
+  Add1,
   Unsigned,
 };
 
@@ -55,8 +56,8 @@ pub trait BTreeValue {
 }
 
 pub(crate) struct Node<A> {
-  keys: Chunk<A, 64>,
-  children: Chunk<Option<PoolRef<Node<A>>>, 65>,
+  keys: Chunk<A, NodeSize>,
+  children: Chunk<Option<PoolRef<Node<A>>>, Add1<NodeSize>>,
 }
 
 #[cfg(feature = "pool")]

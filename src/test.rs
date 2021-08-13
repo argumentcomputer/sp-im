@@ -4,10 +4,7 @@
 
 // use metrohash::MetroHash64;
 use sp_std::{
-  hash::{
-    // BuildHasher,
-    Hasher,
-  },
+  hash::Hasher,
   marker::PhantomData,
 };
 use typenum::{
@@ -74,5 +71,5 @@ impl<N: Unsigned> Default for LolHasher<N> {
 // impl BuildHasher for MetroHashBuilder {
 //   type Hasher = MetroHash64;
 
-//   fn build_hasher(&self) -> Self::Hasher { MetroHash64::with_seed(self.seed) }
-// }
+//   fn build_hasher(&self) -> Self::Hasher { MetroHash64::with_seed(self.seed)
+// } }

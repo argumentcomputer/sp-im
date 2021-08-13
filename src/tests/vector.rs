@@ -1,9 +1,16 @@
 #![allow(clippy::unit_arg)]
 
-use std::fmt::{Debug, Error, Formatter, Write};
-use std::iter::FromIterator;
-use rand::Rng;
 use crate::Vector;
+use rand::Rng;
+use std::{
+  fmt::{
+    Debug,
+    Error,
+    Formatter,
+    Write,
+  },
+  iter::FromIterator,
+};
 
 use quickcheck::{
   Arbitrary,
@@ -48,100 +55,94 @@ impl<A: Arbitrary> Arbitrary for Action<A> {
 }
 
 impl<A: Arbitrary> Arbitrary for Actions<A> {
-  fn arbitrary(g: &mut Gen) -> Self {
-    Actions(Vec::<Action<A>>::arbitrary(g))
-  }
+  fn arbitrary(g: &mut Gen) -> Self { Actions(Vec::<Action<A>>::arbitrary(g)) }
 }
 
 impl<A> Debug for Actions<A>
-where
-    A: Debug + Clone,
+where A: Debug + Clone
 {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        let mut out = String::new();
-        let mut expected = vec![];
-        writeln!(out, "let mut vec = Vector::new();")?;
-        for action in &self.0 {
-            match action {
-                Action::PushFront(ref value) => {
-                    expected.insert(0, value.clone());
-                    writeln!(out, "vec.push_front({:?});", value)?
-                }
-                Action::PushBack(ref value) => {
-                    expected.push(value.clone());
-                    writeln!(out, "vec.push_back({:?});", value)?
-                }
-                Action::PopFront => {
-                    if !expected.is_empty() {
-                        expected.remove(0);
-                    }
-                    writeln!(out, "vec.pop_front();")?
-                }
-                Action::PopBack => {
-                    expected.pop();
-                    writeln!(out, "vec.pop_back();")?
-                }
-                Action::Insert(ref index, ref value) => {
-                    let index = cap_index(expected.len(), *index);
-                    expected.insert(index, value.clone());
-                    writeln!(out, "vec.insert({:?}, {:?});", index, value)?
-                }
-                Action::Remove(ref index) => {
-                    if !expected.is_empty() {
-                        let index = cap_index(expected.len(), *index);
-                        expected.remove(index);
-                        writeln!(out, "vec.remove({:?})", index)?
-                    } else {
-                        continue;
-                    }
-                }
-                Action::JoinLeft(ref vec) => {
-                    let mut vec_new = vec.clone();
-                    vec_new.append(&mut expected);
-                    expected = vec_new;
-                    writeln!(
-                        out,
-                        "let mut vec_new = Vector::from(vec!{:?}); // size {:?}",
-                        vec,
-                        vec.len()
-                    )?;
-                    writeln!(out, "vec_new.append(vec);")?;
-                    writeln!(out, "vec = vec_new;")?
-                }
-                Action::JoinRight(ref vec) => {
-                    expected.append(&mut vec.clone());
-                    writeln!(
-                        out,
-                        "vec.append(Vector::from(vec!{:?})); // size {:?}",
-                        vec,
-                        vec.len()
-                    )?
-                }
-                Action::SplitLeft(ref index) => {
-                    let index = cap_index(expected.len(), *index);
-                    expected.truncate(index);
-                    writeln!(out, "vec.split_off({:?});", index)?
-                }
-                Action::SplitRight(ref index) => {
-                    let index = cap_index(expected.len(), *index);
-                    expected = expected.split_off(index);
-                    writeln!(out, "vec = vec.split_off({:?});", index)?
-                }
-            }
-            writeln!(out, "// len = {:?}", expected.len())?;
+  fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+    let mut out = String::new();
+    let mut expected = vec![];
+    writeln!(out, "let mut vec = Vector::new();")?;
+    for action in &self.0 {
+      match action {
+        Action::PushFront(ref value) => {
+          expected.insert(0, value.clone());
+          writeln!(out, "vec.push_front({:?});", value)?
         }
-        writeln!(out, "let expected = vec!{:?};", expected)?;
-        writeln!(out, "assert_eq!(Vector::from(expected) == vec);")?;
-        write!(f, "{}", super::code_fmt(&out))
+        Action::PushBack(ref value) => {
+          expected.push(value.clone());
+          writeln!(out, "vec.push_back({:?});", value)?
+        }
+        Action::PopFront => {
+          if !expected.is_empty() {
+            expected.remove(0);
+          }
+          writeln!(out, "vec.pop_front();")?
+        }
+        Action::PopBack => {
+          expected.pop();
+          writeln!(out, "vec.pop_back();")?
+        }
+        Action::Insert(ref index, ref value) => {
+          let index = cap_index(expected.len(), *index);
+          expected.insert(index, value.clone());
+          writeln!(out, "vec.insert({:?}, {:?});", index, value)?
+        }
+        Action::Remove(ref index) => {
+          if !expected.is_empty() {
+            let index = cap_index(expected.len(), *index);
+            expected.remove(index);
+            writeln!(out, "vec.remove({:?})", index)?
+          }
+          else {
+            continue;
+          }
+        }
+        Action::JoinLeft(ref vec) => {
+          let mut vec_new = vec.clone();
+          vec_new.append(&mut expected);
+          expected = vec_new;
+          writeln!(
+            out,
+            "let mut vec_new = Vector::from(vec!{:?}); // size {:?}",
+            vec,
+            vec.len()
+          )?;
+          writeln!(out, "vec_new.append(vec);")?;
+          writeln!(out, "vec = vec_new;")?
+        }
+        Action::JoinRight(ref vec) => {
+          expected.append(&mut vec.clone());
+          writeln!(
+            out,
+            "vec.append(Vector::from(vec!{:?})); // size {:?}",
+            vec,
+            vec.len()
+          )?
+        }
+        Action::SplitLeft(ref index) => {
+          let index = cap_index(expected.len(), *index);
+          expected.truncate(index);
+          writeln!(out, "vec.split_off({:?});", index)?
+        }
+        Action::SplitRight(ref index) => {
+          let index = cap_index(expected.len(), *index);
+          expected = expected.split_off(index);
+          writeln!(out, "vec = vec.split_off({:?});", index)?
+        }
+      }
+      writeln!(out, "// len = {:?}", expected.len())?;
     }
+    writeln!(out, "let expected = vec!{:?};", expected)?;
+    writeln!(out, "assert_eq!(Vector::from(expected) == vec);")?;
+    write!(f, "{}", super::code_fmt(&out))
+  }
 }
 
 fn cap_index(len: usize, index: usize) -> usize {
-    if len == 0 {
-        0
-    } else {
-        index % len
-    }
+  if len == 0 { 0 } else { index % len }
 }
 
 quickcheck! {
@@ -247,13 +248,13 @@ quickcheck! {
 
 #[test]
 fn test_inserts() {
-    const N: usize = 2000;
-    let mut v = Vector::new();
-    for i in 0..N {
-        v.insert(v.len() / 2, i);
-    }
-    let mut rv: Vec<usize> = Vec::new();
-    rv.extend((0..N).skip(1).step_by(2));
-    rv.extend((0..N).step_by(2).rev());
-    assert_eq!(Vector::from_iter(rv.iter().cloned()), v);
+  const N: usize = 2000;
+  let mut v = Vector::new();
+  for i in 0..N {
+    v.insert(v.len() / 2, i);
+  }
+  let mut rv: Vec<usize> = Vec::new();
+  rv.extend((0..N).skip(1).step_by(2));
+  rv.extend((0..N).step_by(2).rev());
+  assert_eq!(Vector::from_iter(rv.iter().cloned()), v);
 }
