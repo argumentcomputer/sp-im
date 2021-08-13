@@ -22,10 +22,10 @@ use sp_std::{
     ToOwned,
   },
   cmp::Ordering,
-  collections::{
-    btree_map::{self, BTreeMap},
+  collections::btree_map::{
+    self,
+    BTreeMap,
   },
-  vec::Vec,
   fmt::{
     Debug,
     Error,
@@ -47,6 +47,7 @@ use sp_std::{
     IndexMut,
     RangeBounds,
   },
+  vec::Vec,
 };
 
 #[cfg(has_specialisation)]
@@ -1976,9 +1977,7 @@ where
   K: Ord + Clone + From<RK>,
   V: Clone + From<RV>,
 {
-  fn from(m: BTreeMap<RK, RV>) -> OrdMap<K, V> {
-    m.into_iter().collect()
-  }
+  fn from(m: BTreeMap<RK, RV>) -> OrdMap<K, V> { m.into_iter().collect() }
 }
 
 impl<'a, K: Ord, V, RK, RV, OK, OV> From<&'a btree_map::BTreeMap<RK, RV>>
@@ -2001,15 +2000,12 @@ where
 #[cfg(test)]
 mod test {
   use super::*;
-  use crate::{
-    // proptest::*,
-    test::is_sorted,
-  };
+  use crate::test::is_sorted;
   use rand::{
-    Rng,
     random,
-    thread_rng,
     seq::SliceRandom,
+    thread_rng,
+    Rng,
   };
   // use ::proptest::{
   //   bool,
@@ -2337,7 +2333,7 @@ mod test {
         FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));
       m.len() == map.iter().count()
     }
-    
+
     fn equality(m: BTreeMap<i16, i16>) -> bool {
       let map1: OrdMap<i16, i16> =
         FromIterator::from_iter(m.iter().map(|(k, v)| (*k, *v)));

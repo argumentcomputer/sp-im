@@ -3,191 +3,156 @@
 //! These are only available when using the `rayon` feature flag.
 
 use super::*;
-use ::rayon::iter::plumbing::{bridge, Consumer, Producer, ProducerCallback, UnindexedConsumer};
 use ::rayon::iter::{
-    IndexedParallelIterator, IntoParallelRefIterator, IntoParallelRefMutIterator, ParallelIterator,
+  plumbing::{
+    bridge,
+    Consumer,
+    Producer,
+    ProducerCallback,
+    UnindexedConsumer,
+  },
+  IndexedParallelIterator,
+  IntoParallelRefIterator,
+  IntoParallelRefMutIterator,
+  ParallelIterator,
 };
 
 impl<'a, A> IntoParallelRefIterator<'a> for Vector<A>
-where
-    A: Clone + Send + Sync + 'a,
+where A: Clone + Send + Sync + 'a
 {
-    type Item = &'a A;
-    type Iter = ParIter<'a, A>;
+  type Item = &'a A;
+  type Iter = ParIter<'a, A>;
 
-    fn par_iter(&'a self) -> Self::Iter {
-        ParIter {
-            focus: self.focus(),
-        }
-    }
+  fn par_iter(&'a self) -> Self::Iter { ParIter { focus: self.focus() } }
 }
 
 impl<'a, A> IntoParallelRefMutIterator<'a> for Vector<A>
-where
-    A: Clone + Send + Sync + 'a,
+where A: Clone + Send + Sync + 'a
 {
-    type Item = &'a mut A;
-    type Iter = ParIterMut<'a, A>;
+  type Item = &'a mut A;
+  type Iter = ParIterMut<'a, A>;
 
-    fn par_iter_mut(&'a mut self) -> Self::Iter {
-        ParIterMut {
-            focus: self.focus_mut(),
-        }
-    }
+  fn par_iter_mut(&'a mut self) -> Self::Iter {
+    ParIterMut { focus: self.focus_mut() }
+  }
 }
 
 /// A parallel iterator for [`Vector`][Vector].
 ///
 /// [Vector]: ../struct.Vector.html
 pub struct ParIter<'a, A>
-where
-    A: Clone + Send + Sync,
-{
-    focus: Focus<'a, A>,
+where A: Clone + Send + Sync {
+  focus: Focus<'a, A>,
 }
 
 impl<'a, A> ParallelIterator for ParIter<'a, A>
-where
-    A: Clone + Send + Sync + 'a,
+where A: Clone + Send + Sync + 'a
 {
-    type Item = &'a A;
+  type Item = &'a A;
 
-    fn drive_unindexed<C>(self, consumer: C) -> C::Result
-    where
-        C: UnindexedConsumer<Self::Item>,
-    {
-        bridge(self, consumer)
-    }
+  fn drive_unindexed<C>(self, consumer: C) -> C::Result
+  where C: UnindexedConsumer<Self::Item> {
+    bridge(self, consumer)
+  }
 }
 
 impl<'a, A> IndexedParallelIterator for ParIter<'a, A>
-where
-    A: Clone + Send + Sync + 'a,
+where A: Clone + Send + Sync + 'a
 {
-    fn drive<C>(self, consumer: C) -> C::Result
-    where
-        C: Consumer<Self::Item>,
-    {
-        bridge(self, consumer)
-    }
+  fn drive<C>(self, consumer: C) -> C::Result
+  where C: Consumer<Self::Item> {
+    bridge(self, consumer)
+  }
 
-    fn len(&self) -> usize {
-        self.focus.len()
-    }
+  fn len(&self) -> usize { self.focus.len() }
 
-    fn with_producer<CB>(self, callback: CB) -> CB::Output
-    where
-        CB: ProducerCallback<Self::Item>,
-    {
-        callback.callback(VectorProducer { focus: self.focus })
-    }
+  fn with_producer<CB>(self, callback: CB) -> CB::Output
+  where CB: ProducerCallback<Self::Item> {
+    callback.callback(VectorProducer { focus: self.focus })
+  }
 }
 
 /// A mutable parallel iterator for [`Vector`][Vector].
 ///
 /// [Vector]: ../struct.Vector.html
 pub struct ParIterMut<'a, A>
-where
-    A: Clone + Send + Sync,
-{
-    focus: FocusMut<'a, A>,
+where A: Clone + Send + Sync {
+  focus: FocusMut<'a, A>,
 }
 
 impl<'a, A> ParallelIterator for ParIterMut<'a, A>
-where
-    A: Clone + Send + Sync + 'a,
+where A: Clone + Send + Sync + 'a
 {
-    type Item = &'a mut A;
+  type Item = &'a mut A;
 
-    fn drive_unindexed<C>(self, consumer: C) -> C::Result
-    where
-        C: UnindexedConsumer<Self::Item>,
-    {
-        bridge(self, consumer)
-    }
+  fn drive_unindexed<C>(self, consumer: C) -> C::Result
+  where C: UnindexedConsumer<Self::Item> {
+    bridge(self, consumer)
+  }
 }
 
 impl<'a, A> IndexedParallelIterator for ParIterMut<'a, A>
-where
-    A: Clone + Send + Sync + 'a,
+where A: Clone + Send + Sync + 'a
 {
-    fn drive<C>(self, consumer: C) -> C::Result
-    where
-        C: Consumer<Self::Item>,
-    {
-        bridge(self, consumer)
-    }
+  fn drive<C>(self, consumer: C) -> C::Result
+  where C: Consumer<Self::Item> {
+    bridge(self, consumer)
+  }
 
-    fn len(&self) -> usize {
-        self.focus.len()
-    }
+  fn len(&self) -> usize { self.focus.len() }
 
-    fn with_producer<CB>(self, callback: CB) -> CB::Output
-    where
-        CB: ProducerCallback<Self::Item>,
-    {
-        callback.callback(VectorMutProducer { focus: self.focus })
-    }
+  fn with_producer<CB>(self, callback: CB) -> CB::Output
+  where CB: ProducerCallback<Self::Item> {
+    callback.callback(VectorMutProducer { focus: self.focus })
+  }
 }
 
 struct VectorProducer<'a, A>
-where
-    A: Clone + Send + Sync,
-{
-    focus: Focus<'a, A>,
+where A: Clone + Send + Sync {
+  focus: Focus<'a, A>,
 }
 
 impl<'a, A> Producer for VectorProducer<'a, A>
-where
-    A: Clone + Send + Sync + 'a,
+where A: Clone + Send + Sync + 'a
 {
-    type Item = &'a A;
-    type IntoIter = Iter<'a, A>;
+  type IntoIter = Iter<'a, A>;
+  type Item = &'a A;
 
-    fn into_iter(self) -> Self::IntoIter {
-        self.focus.into_iter()
-    }
+  fn into_iter(self) -> Self::IntoIter { self.focus.into_iter() }
 
-    fn split_at(self, index: usize) -> (Self, Self) {
-        let (left, right) = self.focus.split_at(index);
-        (
-            VectorProducer { focus: left },
-            VectorProducer { focus: right },
-        )
-    }
+  fn split_at(self, index: usize) -> (Self, Self) {
+    let (left, right) = self.focus.split_at(index);
+    (VectorProducer { focus: left }, VectorProducer { focus: right })
+  }
 }
 
 struct VectorMutProducer<'a, A>
-where
-    A: Clone + Send + Sync,
-{
-    focus: FocusMut<'a, A>,
+where A: Clone + Send + Sync {
+  focus: FocusMut<'a, A>,
 }
 
 impl<'a, A> Producer for VectorMutProducer<'a, A>
-where
-    A: Clone + Send + Sync + 'a,
+where A: Clone + Send + Sync + 'a
 {
-    type Item = &'a mut A;
-    type IntoIter = IterMut<'a, A>;
+  type IntoIter = IterMut<'a, A>;
+  type Item = &'a mut A;
 
-    fn into_iter(self) -> Self::IntoIter {
-        self.focus.into_iter()
-    }
+  fn into_iter(self) -> Self::IntoIter { self.focus.into_iter() }
 
-    fn split_at(self, index: usize) -> (Self, Self) {
-        let (left, right) = self.focus.split_at(index);
-        (
-            VectorMutProducer { focus: left },
-            VectorMutProducer { focus: right },
-        )
-    }
+  fn split_at(self, index: usize) -> (Self, Self) {
+    let (left, right) = self.focus.split_at(index);
+    (VectorMutProducer { focus: left }, VectorMutProducer { focus: right })
+  }
 }
 
 #[cfg(test)]
 mod test {
   use super::super::*;
-  use ::rayon::iter::{IntoParallelRefIterator, IntoParallelRefMutIterator, ParallelIterator};
+  use ::rayon::iter::{
+    IntoParallelRefIterator,
+    IntoParallelRefMutIterator,
+    ParallelIterator,
+  };
 
   quickcheck! {
     fn par_iter(input: Vector<i32>) -> bool {

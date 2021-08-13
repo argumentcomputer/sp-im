@@ -1,7 +1,14 @@
 #![allow(clippy::unit_arg)]
 
-use std::collections::BTreeSet;
-use std::fmt::{Debug, Error, Formatter, Write};
+use std::{
+  collections::BTreeSet,
+  fmt::{
+    Debug,
+    Error,
+    Formatter,
+    Write,
+  },
+};
 
 use crate::OrdSet;
 use rand::Rng;
@@ -13,14 +20,13 @@ use quickcheck::{
 
 #[derive(Debug, Clone)]
 enum Action<A> {
-    Insert(A),
-    Remove(A),
+  Insert(A),
+  Remove(A),
 }
 
 #[derive(Clone)]
 struct Actions<A>(Vec<Action<A>>)
-where
-    A: Ord + Clone;
+where A: Ord + Clone;
 
 impl<A: Arbitrary + Ord> Arbitrary for Action<A> {
   fn arbitrary(g: &mut Gen) -> Self {
@@ -33,39 +39,36 @@ impl<A: Arbitrary + Ord> Arbitrary for Action<A> {
 }
 
 impl<A: Arbitrary + Ord> Arbitrary for Actions<A> {
-  fn arbitrary(g: &mut Gen) -> Self {
-    Actions(Vec::<Action<A>>::arbitrary(g))
-  }
+  fn arbitrary(g: &mut Gen) -> Self { Actions(Vec::<Action<A>>::arbitrary(g)) }
 }
 
 impl<A> Debug for Actions<A>
-where
-    A: Ord + Debug + Clone,
+where A: Ord + Debug + Clone
 {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        let mut out = String::new();
-        let mut expected = BTreeSet::new();
-        writeln!(out, "let mut set = OrdSet::new();")?;
-        for action in &self.0 {
-            match action {
-                Action::Insert(ref value) => {
-                    expected.insert(value.clone());
-                    writeln!(out, "set.insert({:?});", value)?;
-                }
-                Action::Remove(ref value) => {
-                    expected.remove(value);
-                    writeln!(out, "set.remove({:?});", value)?;
-                }
-            }
+  fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+    let mut out = String::new();
+    let mut expected = BTreeSet::new();
+    writeln!(out, "let mut set = OrdSet::new();")?;
+    for action in &self.0 {
+      match action {
+        Action::Insert(ref value) => {
+          expected.insert(value.clone());
+          writeln!(out, "set.insert({:?});", value)?;
         }
-        writeln!(
-            out,
-            "let expected = vec!{:?};",
-            expected.into_iter().collect::<Vec<_>>()
-        )?;
-        writeln!(out, "assert_eq!(OrdSet::from(expected), set);")?;
-        write!(f, "{}", super::code_fmt(&out))
+        Action::Remove(ref value) => {
+          expected.remove(value);
+          writeln!(out, "set.remove({:?});", value)?;
+        }
+      }
     }
+    writeln!(
+      out,
+      "let expected = vec!{:?};",
+      expected.into_iter().collect::<Vec<_>>()
+    )?;
+    writeln!(out, "assert_eq!(OrdSet::from(expected), set);")?;
+    write!(f, "{}", super::code_fmt(&out))
+  }
 }
 
 quickcheck! {

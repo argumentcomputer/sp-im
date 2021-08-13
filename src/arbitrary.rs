@@ -18,8 +18,6 @@ use arbitrary::{
 };
 
 use crate::{
-  // HashMap,
-  // HashSet,
   OrdMap,
   OrdSet,
   Vector,
@@ -50,8 +48,8 @@ use crate::{
 //   Box::new(iter::once(Vec::new()).chain(iter::from_fn(move || {
 //     loop {
 //       let mut shrinker = shrinkers.pop()?;
-//       let x: Option<Vec<A>> = shrinker.iter_mut().map(|s| s.next()).collect();
-//       if x.is_none() {
+//       let x: Option<Vec<A>> = shrinker.iter_mut().map(|s|
+// s.next()).collect();       if x.is_none() {
 //         continue;
 //       }
 //       shrinkers.push(shrinker);
@@ -127,21 +125,27 @@ impl<'a, A: Arbitrary<'a> + Ord + Clone> Arbitrary<'a> for OrdSet<A> {
   // }
 }
 
-impl<A: quickcheck::Arbitrary + Ord + Clone> quickcheck::Arbitrary for OrdSet<A> {
+impl<A: quickcheck::Arbitrary + Ord + Clone> quickcheck::Arbitrary
+  for OrdSet<A>
+{
   fn arbitrary(g: &mut quickcheck::Gen) -> Self {
     OrdSet::from(Vec::<A>::arbitrary(g))
   }
 }
 
-impl<A: quickcheck::Arbitrary + Ord + Clone> quickcheck::Arbitrary for Vector<A> {
+impl<A: quickcheck::Arbitrary + Ord + Clone> quickcheck::Arbitrary
+  for Vector<A>
+{
   fn arbitrary(g: &mut quickcheck::Gen) -> Self {
     Vector::from(Vec::<A>::arbitrary(g))
   }
 }
 
-impl<A: quickcheck::Arbitrary + Ord + Clone> quickcheck::Arbitrary for OrdMap<A, A> {
+impl<A: quickcheck::Arbitrary + Ord + Clone> quickcheck::Arbitrary
+  for OrdMap<A, A>
+{
   fn arbitrary(g: &mut quickcheck::Gen) -> Self {
-    OrdMap::from(Vec::<(A,A)>::arbitrary(g))
+    OrdMap::from(Vec::<(A, A)>::arbitrary(g))
   }
 }
 

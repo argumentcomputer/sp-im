@@ -20,17 +20,34 @@
 
 use crate::shared::Shared;
 use sp_std::{
-    borrow::Borrow,
-    cmp::Ordering,
-    fmt::{Debug, Error, Formatter},
-    hash::{Hash, Hasher},
-    iter::{FromIterator, Iterator, Sum},
-    ops::{Add, Deref},
-    sync::Arc,
-    vec::Vec,
+  borrow::Borrow,
+  cmp::Ordering,
+  fmt::{
+    Debug,
+    Error,
+    Formatter,
+  },
+  hash::{
+    Hash,
+    Hasher,
+  },
+  iter::{
+    FromIterator,
+    Iterator,
+    Sum,
+  },
+  ops::{
+    Add,
+    Deref,
+  },
+  sync::Arc,
+  vec::Vec,
 };
 
-use self::ConsListNode::{Cons, Nil};
+use self::ConsListNode::{
+  Cons,
+  Nil,
+};
 
 /// Construct a list from a sequence of elements.
 ///
@@ -109,10 +126,9 @@ macro_rules! conslist {
 #[inline]
 pub fn cons<A, RA, RD>(car: RA, cdr: RD) -> ConsList<A>
 where
-    RA: Shared<A>,
-    RD: Borrow<ConsList<A>>,
-{
-    cdr.borrow().cons(car)
+  RA: Shared<A>,
+  RD: Borrow<ConsList<A>>, {
+  cdr.borrow().cons(car)
 }
 
 /// An immutable proper cons lists.
@@ -132,385 +148,368 @@ pub struct ConsList<A>(Arc<ConsListNode<A>>);
 
 #[doc(hidden)]
 pub enum ConsListNode<A> {
-    Cons(usize, Arc<A>, ConsList<A>),
-    Nil,
+  Cons(usize, Arc<A>, ConsList<A>),
+  Nil,
 }
 
 impl<A> ConsList<A> {
-    /// Construct an empty list.
-    pub fn new() -> ConsList<A> {
-        ConsList(Arc::new(Nil))
-    }
+  /// Construct an empty list.
+  pub fn new() -> ConsList<A> { ConsList(Arc::new(Nil)) }
 
-    /// Construct a list with a single element.
-    pub fn singleton<R>(v: R) -> ConsList<A>
-    where
-        R: Shared<A>,
-    {
-        ConsList(Arc::new(Cons(1, v.shared(), conslist![])))
-    }
+  /// Construct a list with a single element.
+  pub fn singleton<R>(v: R) -> ConsList<A>
+  where R: Shared<A> {
+    ConsList(Arc::new(Cons(1, v.shared(), conslist![])))
+  }
 
-    /// Test whether a list is empty.
-    ///
-    /// Time: O(1)
-    pub fn is_empty(&self) -> bool {
-        match *self.0 {
-            Nil => true,
-            _ => false,
+  /// Test whether a list is empty.
+  ///
+  /// Time: O(1)
+  pub fn is_empty(&self) -> bool {
+    match *self.0 {
+      Nil => true,
+      _ => false,
+    }
+  }
+
+  /// Construct a list with a new value prepended to the front of
+  /// the current list.
+  ///
+  /// Time: O(1)
+  pub fn cons<R>(&self, car: R) -> ConsList<A>
+  where R: Shared<A> {
+    ConsList(Arc::new(Cons(self.len() + 1, car.shared(), self.clone())))
+  }
+
+  /// Get the first element of a list.
+  ///
+  /// If the list is empty, `None` is returned.
+  ///
+  /// Time: O(1)
+  pub fn head(&self) -> Option<Arc<A>> {
+    match *self.0 {
+      Cons(_, ref a, _) => Some(a.clone()),
+      _ => None,
+    }
+  }
+
+  /// Get the tail of a list.
+  ///
+  /// The tail means all elements in the list after the first item
+  /// (the head). If the list only has one element, the result is an
+  /// empty list. If the list is empty, the result is `None`.
+  ///
+  /// Time: O(1)
+  pub fn tail(&self) -> Option<ConsList<A>> {
+    match *self.0 {
+      Cons(_, _, ref d) => Some(d.clone()),
+      Nil => None,
+    }
+  }
+
+  /// Get the head and the tail of a list.
+  ///
+  /// This function performs both the [`head`][head] function and
+  /// the [`tail`][tail] function in one go, returning a tuple of
+  /// the head and the tail, or [`None`][None] if the list is empty.
+  ///
+  /// # Examples
+  ///
+  /// This can be useful when pattern matching your way through a
+  /// list:
+  ///
+  /// ```
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::conslist::{ConsList, cons};
+  /// # use std::fmt::Debug;
+  /// fn walk_through_list<A>(list: &ConsList<A>)
+  /// where A: Debug {
+  ///   match list.uncons() {
+  ///     None => (),
+  ///     Some((ref head, ref tail)) => {
+  ///       print!("{:?}", head);
+  ///       walk_through_list(tail)
+  ///     }
+  ///   }
+  /// }
+  /// # fn main() {
+  /// # }
+  /// ```
+  ///
+  /// Time: O(1)
+  ///
+  /// [head]: #method.head
+  /// [tail]: #method.tail
+  /// [None]: https://doc.rust-lang.org/core/option/enum.Option.html#variant.None
+  pub fn uncons(&self) -> Option<(Arc<A>, ConsList<A>)> {
+    match *self.0 {
+      Nil => None,
+      Cons(_, ref a, ref d) => Some((a.clone(), d.clone())),
+    }
+  }
+
+  /// Get the two first elements and the tail of a list.
+  ///
+  /// This function performs both the [`head`][head] function twice and
+  /// the [`tail`][tail] function in one go, returning a tuple of
+  /// the double head and the tail, or [`None`][None] if the list is empty.
+  ///
+  /// # Examples
+  ///
+  /// This can be useful when pattern matching your way through a
+  /// list:
+  ///
+  /// ```
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::conslist::{ConsList, cons};
+  /// # use std::fmt::Debug;
+  /// fn walk_through_list<A>(list: &ConsList<A>)
+  /// where A: Debug {
+  ///   match list.uncons2() {
+  ///     None => (),
+  ///     Some((ref head, ref head2, ref tail)) => {
+  ///       print!("{:?} {:?}", head, head2);
+  ///       walk_through_list(tail)
+  ///     }
+  ///   }
+  /// }
+  /// # fn main() {
+  /// # }
+  /// ```
+  ///
+  /// Time: O(1)
+  ///
+  /// [head]: #method.head
+  /// [tail]: #method.tail
+  /// [None]: https://doc.rust-lang.org/core/option/enum.Option.html#variant.None
+  pub fn uncons2(&self) -> Option<(Arc<A>, Arc<A>, ConsList<A>)> {
+    self.uncons().and_then(|(a1, d)| d.uncons().map(|(a2, d)| (a1, a2, d)))
+  }
+
+  /// Get the length of a list.
+  ///
+  /// This operation is instant, because cons cells store the length
+  /// of the list they're the head of.
+  ///
+  /// Time: O(1)
+  ///
+  /// # Examples
+  ///
+  /// ```
+  /// # #[macro_use] extern crate sp_im;
+  /// # fn main() {
+  /// assert_eq!(5, conslist![1, 2, 3, 4, 5].len());
+  /// # }
+  /// ```
+  pub fn len(&self) -> usize {
+    match *self.0 {
+      Nil => 0,
+      Cons(l, ..) => l,
+    }
+  }
+
+  /// Append the list `right` to the end of the current list.
+  ///
+  /// Time: O(n)
+  ///
+  /// # Examples
+  ///
+  /// ```
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::conslist::ConsList;
+  /// # fn main() {
+  /// assert_eq!(conslist![1, 2, 3].append(conslist![7, 8, 9]), conslist![
+  ///   1, 2, 3, 7, 8, 9
+  /// ]);
+  /// # }
+  /// ```
+  pub fn append<R>(&self, right: R) -> Self
+  where R: Borrow<Self> {
+    match *self.0 {
+      Nil => right.borrow().clone(),
+      Cons(_, ref a, ref d) => cons(a.clone(), &d.append(right)),
+    }
+  }
+
+  /// Construct a list which is the reverse of the current list.
+  ///
+  /// Time: O(n)
+  ///
+  /// # Examples
+  ///
+  /// ```
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::conslist::ConsList;
+  /// # fn main() {
+  /// assert_eq!(conslist![1, 2, 3, 4, 5].reverse(), conslist![5, 4, 3, 2, 1]);
+  /// # }
+  /// ```
+  pub fn reverse(&self) -> ConsList<A> {
+    let mut out = ConsList::new();
+    for i in self.iter() {
+      out = out.cons(i);
+    }
+    out
+  }
+
+  /// Get an iterator over a list.
+  pub fn iter(&self) -> Iter<A> { Iter { current: self.clone() } }
+
+  /// Sort a list using a comparator function.
+  ///
+  /// Time: O(n log n)
+  pub fn sort_by<F>(&self, cmp: F) -> ConsList<A>
+  where F: Fn(&A, &A) -> Ordering {
+    fn merge<A>(
+      la: &ConsList<A>,
+      lb: &ConsList<A>,
+      cmp: &dyn Fn(&A, &A) -> Ordering,
+    ) -> ConsList<A> {
+      match (la.uncons(), lb.uncons()) {
+        (Some((ref a, _)), Some((ref b, ref lb1)))
+          if cmp(a, b) == Ordering::Greater =>
+        {
+          cons(b.clone(), &merge(la, lb1, cmp))
         }
+        (Some((a, la1)), Some((..))) => cons(a.clone(), &merge(&la1, lb, cmp)),
+        (None, _) => lb.clone(),
+        (_, None) => la.clone(),
+      }
     }
 
-    /// Construct a list with a new value prepended to the front of
-    /// the current list.
-    ///
-    /// Time: O(1)
-    pub fn cons<R>(&self, car: R) -> ConsList<A>
-    where
-        R: Shared<A>,
-    {
-        ConsList(Arc::new(Cons(self.len() + 1, car.shared(), self.clone())))
-    }
-
-    /// Get the first element of a list.
-    ///
-    /// If the list is empty, `None` is returned.
-    ///
-    /// Time: O(1)
-    pub fn head(&self) -> Option<Arc<A>> {
-        match *self.0 {
-            Cons(_, ref a, _) => Some(a.clone()),
-            _ => None,
+    fn merge_pairs<A>(
+      l: &ConsList<ConsList<A>>,
+      cmp: &dyn Fn(&A, &A) -> Ordering,
+    ) -> ConsList<ConsList<A>> {
+      match l.uncons2() {
+        Some((a, b, rest)) => {
+          cons(merge(&a, &b, cmp), &merge_pairs(&rest, cmp))
         }
+        _ => l.clone(),
+      }
     }
 
-    /// Get the tail of a list.
-    ///
-    /// The tail means all elements in the list after the first item
-    /// (the head). If the list only has one element, the result is an
-    /// empty list. If the list is empty, the result is `None`.
-    ///
-    /// Time: O(1)
-    pub fn tail(&self) -> Option<ConsList<A>> {
-        match *self.0 {
-            Cons(_, _, ref d) => Some(d.clone()),
-            Nil => None,
-        }
+    fn merge_all<A>(
+      l: &ConsList<ConsList<A>>,
+      cmp: &dyn Fn(&A, &A) -> Ordering,
+    ) -> ConsList<A> {
+      match l.uncons() {
+        None => conslist![],
+        Some((ref a, ref d)) if d.is_empty() => a.deref().clone(),
+        _ => merge_all(&merge_pairs(l, cmp), cmp),
+      }
     }
 
-    /// Get the head and the tail of a list.
-    ///
-    /// This function performs both the [`head`][head] function and
-    /// the [`tail`][tail] function in one go, returning a tuple of
-    /// the head and the tail, or [`None`][None] if the list is empty.
-    ///
-    /// # Examples
-    ///
-    /// This can be useful when pattern matching your way through a
-    /// list:
-    ///
-    /// ```
-    /// # #[macro_use] extern crate sp_im;
-    /// # use sp_im::conslist::{ConsList, cons};
-    /// # use std::fmt::Debug;
-    /// fn walk_through_list<A>(list: &ConsList<A>)
-    /// where A: Debug {
-    ///   match list.uncons() {
-    ///     None => (),
-    ///     Some((ref head, ref tail)) => {
-    ///       print!("{:?}", head);
-    ///       walk_through_list(tail)
-    ///     }
-    ///   }
-    /// }
-    /// # fn main() {
-    /// # }
-    /// ```
-    ///
-    /// Time: O(1)
-    ///
-    /// [head]: #method.head
-    /// [tail]: #method.tail
-    /// [None]: https://doc.rust-lang.org/core/option/enum.Option.html#variant.None
-    pub fn uncons(&self) -> Option<(Arc<A>, ConsList<A>)> {
-        match *self.0 {
-            Nil => None,
-            Cons(_, ref a, ref d) => Some((a.clone(), d.clone())),
+    fn ascending<A>(
+      a: &Arc<A>,
+      f: &dyn Fn(ConsList<A>) -> ConsList<A>,
+      l: &ConsList<A>,
+      cmp: &dyn Fn(&A, &A) -> Ordering,
+    ) -> ConsList<ConsList<A>> {
+      match l.uncons() {
+        Some((ref b, ref lb)) if cmp(a, b) != Ordering::Greater => {
+          ascending(&b.clone(), &|ys| f(cons(a.clone(), &ys)), lb, cmp)
         }
+        _ => cons(f(ConsList::singleton(a.clone())), &sequences(l, cmp)),
+      }
     }
 
-    /// Get the two first elements and the tail of a list.
-    ///
-    /// This function performs both the [`head`][head] function twice and
-    /// the [`tail`][tail] function in one go, returning a tuple of
-    /// the double head and the tail, or [`None`][None] if the list is empty.
-    ///
-    /// # Examples
-    ///
-    /// This can be useful when pattern matching your way through a
-    /// list:
-    ///
-    /// ```
-    /// # #[macro_use] extern crate sp_im;
-    /// # use sp_im::conslist::{ConsList, cons};
-    /// # use std::fmt::Debug;
-    /// fn walk_through_list<A>(list: &ConsList<A>)
-    /// where A: Debug {
-    ///   match list.uncons2() {
-    ///     None => (),
-    ///     Some((ref head, ref head2, ref tail)) => {
-    ///       print!("{:?} {:?}", head, head2);
-    ///       walk_through_list(tail)
-    ///     }
-    ///   }
-    /// }
-    /// # fn main() {
-    /// # }
-    /// ```
-    ///
-    /// Time: O(1)
-    ///
-    /// [head]: #method.head
-    /// [tail]: #method.tail
-    /// [None]: https://doc.rust-lang.org/core/option/enum.Option.html#variant.None
-    pub fn uncons2(&self) -> Option<(Arc<A>, Arc<A>, ConsList<A>)> {
-        self.uncons()
-            .and_then(|(a1, d)| d.uncons().map(|(a2, d)| (a1, a2, d)))
+    fn descending<A>(
+      a: &Arc<A>,
+      la: &ConsList<A>,
+      lb: &ConsList<A>,
+      cmp: &dyn Fn(&A, &A) -> Ordering,
+    ) -> ConsList<ConsList<A>> {
+      match lb.uncons() {
+        Some((ref b, ref bs)) if cmp(a, b) == Ordering::Greater => {
+          descending(&b.clone(), &cons(a.clone(), la), bs, cmp)
+        }
+        _ => cons(cons(a.clone(), la), &sequences(lb, cmp)),
+      }
     }
 
-    /// Get the length of a list.
-    ///
-    /// This operation is instant, because cons cells store the length
-    /// of the list they're the head of.
-    ///
-    /// Time: O(1)
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[macro_use] extern crate sp_im;
-    /// # fn main() {
-    /// assert_eq!(5, conslist![1, 2, 3, 4, 5].len());
-    /// # }
-    /// ```
-    pub fn len(&self) -> usize {
-        match *self.0 {
-            Nil => 0,
-            Cons(l, ..) => l,
+    fn sequences<A>(
+      l: &ConsList<A>,
+      cmp: &dyn Fn(&A, &A) -> Ordering,
+    ) -> ConsList<ConsList<A>> {
+      match l.uncons2() {
+        Some((ref a, ref b, ref xs)) if cmp(a, b) == Ordering::Greater => {
+          descending(&b.clone(), &ConsList::singleton(a.clone()), xs, cmp)
         }
+        Some((ref a, ref b, ref xs)) => {
+          ascending(&b.clone(), &|l| cons(a.clone(), l), xs, cmp)
+        }
+        None => conslist![l.clone()],
+      }
     }
 
-    /// Append the list `right` to the end of the current list.
-    ///
-    /// Time: O(n)
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[macro_use] extern crate sp_im;
-    /// # use sp_im::conslist::ConsList;
-    /// # fn main() {
-    /// assert_eq!(conslist![1, 2, 3].append(conslist![7, 8, 9]), conslist![
-    ///   1, 2, 3, 7, 8, 9
-    /// ]);
-    /// # }
-    /// ```
-    pub fn append<R>(&self, right: R) -> Self
-    where
-        R: Borrow<Self>,
-    {
-        match *self.0 {
-            Nil => right.borrow().clone(),
-            Cons(_, ref a, ref d) => cons(a.clone(), &d.append(right)),
+    merge_all(&sequences(self, &cmp), &cmp)
+  }
+
+  /// Compare the Arc pointers of two ConsList
+  pub fn ptr_eq(&self, other: &Self) -> bool { Arc::ptr_eq(&self.0, &other.0) }
+
+  /// Insert an item into a sorted list.
+  ///
+  /// Constructs a new list with the new item inserted before the
+  /// first item in the list which is larger than the new item,
+  /// as determined by the `Ord` trait.
+  ///
+  /// Time: O(n)
+  ///
+  /// # Examples
+  ///
+  /// ```
+  /// # #[macro_use] extern crate sp_im;
+  /// # fn main() {
+  /// assert_eq!(conslist![2, 4, 6].insert(5).insert(1).insert(3), conslist![
+  ///   1, 2, 3, 4, 5, 6
+  /// ]);
+  /// # }
+  /// ```
+  pub fn insert<T>(&self, item: T) -> ConsList<A>
+  where
+    A: Ord,
+    T: Shared<A>, {
+    self.insert_ref(item.shared())
+  }
+
+  fn insert_ref(&self, item: Arc<A>) -> ConsList<A>
+  where A: Ord {
+    match *self.0 {
+      Nil => ConsList(Arc::new(Cons(0, item, ConsList::new()))),
+      Cons(_, ref a, ref d) => {
+        if a.deref() > item.deref() {
+          self.cons(item)
         }
+        else {
+          d.insert_ref(item).cons(a.clone())
+        }
+      }
     }
+  }
 
-    /// Construct a list which is the reverse of the current list.
-    ///
-    /// Time: O(n)
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[macro_use] extern crate sp_im;
-    /// # use sp_im::conslist::ConsList;
-    /// # fn main() {
-    /// assert_eq!(conslist![1, 2, 3, 4, 5].reverse(), conslist![5, 4, 3, 2, 1]);
-    /// # }
-    /// ```
-    pub fn reverse(&self) -> ConsList<A> {
-        let mut out = ConsList::new();
-        for i in self.iter() {
-            out = out.cons(i);
-        }
-        out
-    }
-
-    /// Get an iterator over a list.
-    pub fn iter(&self) -> Iter<A> {
-        Iter {
-            current: self.clone(),
-        }
-    }
-
-    /// Sort a list using a comparator function.
-    ///
-    /// Time: O(n log n)
-    pub fn sort_by<F>(&self, cmp: F) -> ConsList<A>
-    where
-        F: Fn(&A, &A) -> Ordering,
-    {
-        fn merge<A>(
-            la: &ConsList<A>,
-            lb: &ConsList<A>,
-            cmp: &dyn Fn(&A, &A) -> Ordering,
-        ) -> ConsList<A> {
-            match (la.uncons(), lb.uncons()) {
-                (Some((ref a, _)), Some((ref b, ref lb1))) if cmp(a, b) == Ordering::Greater => {
-                    cons(b.clone(), &merge(la, lb1, cmp))
-                }
-                (Some((a, la1)), Some((..))) => cons(a.clone(), &merge(&la1, lb, cmp)),
-                (None, _) => lb.clone(),
-                (_, None) => la.clone(),
-            }
-        }
-
-        fn merge_pairs<A>(
-            l: &ConsList<ConsList<A>>,
-            cmp: &dyn Fn(&A, &A) -> Ordering,
-        ) -> ConsList<ConsList<A>> {
-            match l.uncons2() {
-                Some((a, b, rest)) => cons(merge(&a, &b, cmp), &merge_pairs(&rest, cmp)),
-                _ => l.clone(),
-            }
-        }
-
-        fn merge_all<A>(
-            l: &ConsList<ConsList<A>>,
-            cmp: &dyn Fn(&A, &A) -> Ordering,
-        ) -> ConsList<A> {
-            match l.uncons() {
-                None => conslist![],
-                Some((ref a, ref d)) if d.is_empty() => a.deref().clone(),
-                _ => merge_all(&merge_pairs(l, cmp), cmp),
-            }
-        }
-
-        fn ascending<A>(
-            a: &Arc<A>,
-            f: &dyn Fn(ConsList<A>) -> ConsList<A>,
-            l: &ConsList<A>,
-            cmp: &dyn Fn(&A, &A) -> Ordering,
-        ) -> ConsList<ConsList<A>> {
-            match l.uncons() {
-                Some((ref b, ref lb)) if cmp(a, b) != Ordering::Greater => {
-                    ascending(&b.clone(), &|ys| f(cons(a.clone(), &ys)), lb, cmp)
-                }
-                _ => cons(f(ConsList::singleton(a.clone())), &sequences(l, cmp)),
-            }
-        }
-
-        fn descending<A>(
-            a: &Arc<A>,
-            la: &ConsList<A>,
-            lb: &ConsList<A>,
-            cmp: &dyn Fn(&A, &A) -> Ordering,
-        ) -> ConsList<ConsList<A>> {
-            match lb.uncons() {
-                Some((ref b, ref bs)) if cmp(a, b) == Ordering::Greater => {
-                    descending(&b.clone(), &cons(a.clone(), la), bs, cmp)
-                }
-                _ => cons(cons(a.clone(), la), &sequences(lb, cmp)),
-            }
-        }
-
-        fn sequences<A>(
-            l: &ConsList<A>,
-            cmp: &dyn Fn(&A, &A) -> Ordering,
-        ) -> ConsList<ConsList<A>> {
-            match l.uncons2() {
-                Some((ref a, ref b, ref xs)) if cmp(a, b) == Ordering::Greater => {
-                    descending(&b.clone(), &ConsList::singleton(a.clone()), xs, cmp)
-                }
-                Some((ref a, ref b, ref xs)) => {
-                    ascending(&b.clone(), &|l| cons(a.clone(), l), xs, cmp)
-                }
-                None => conslist![l.clone()],
-            }
-        }
-
-        merge_all(&sequences(self, &cmp), &cmp)
-    }
-
-    /// Compare the Arc pointers of two ConsList
-    pub fn ptr_eq(&self, other: &Self) -> bool {
-        Arc::ptr_eq(&self.0, &other.0)
-    }
-
-    /// Insert an item into a sorted list.
-    ///
-    /// Constructs a new list with the new item inserted before the
-    /// first item in the list which is larger than the new item,
-    /// as determined by the `Ord` trait.
-    ///
-    /// Time: O(n)
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[macro_use] extern crate sp_im;
-    /// # fn main() {
-    /// assert_eq!(conslist![2, 4, 6].insert(5).insert(1).insert(3), conslist![
-    ///   1, 2, 3, 4, 5, 6
-    /// ]);
-    /// # }
-    /// ```
-    pub fn insert<T>(&self, item: T) -> ConsList<A>
-    where
-        A: Ord,
-        T: Shared<A>,
-    {
-        self.insert_ref(item.shared())
-    }
-
-    fn insert_ref(&self, item: Arc<A>) -> ConsList<A>
-    where
-        A: Ord,
-    {
-        match *self.0 {
-            Nil => ConsList(Arc::new(Cons(0, item, ConsList::new()))),
-            Cons(_, ref a, ref d) => {
-                if a.deref() > item.deref() {
-                    self.cons(item)
-                } else {
-                    d.insert_ref(item).cons(a.clone())
-                }
-            }
-        }
-    }
-
-    /// Sort a list.
-    ///
-    /// Time: O(n log n)
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// # #[macro_use] extern crate sp_im;
-    /// # use sp_im::conslist::ConsList;
-    /// # use sp_std::iter::FromIterator;
-    /// # fn main() {
-    /// assert_eq!(
-    ///   conslist![2, 8, 1, 6, 3, 7, 5, 4].sort(),
-    ///   ConsList::from_iter(1..9)
-    /// );
-    /// # }
-    /// ```
-    pub fn sort(&self) -> ConsList<A>
-    where
-        A: Ord,
-    {
-        self.sort_by(Ord::cmp)
-    }
+  /// Sort a list.
+  ///
+  /// Time: O(n log n)
+  ///
+  /// # Examples
+  ///
+  /// ```
+  /// # #[macro_use] extern crate sp_im;
+  /// # use sp_im::conslist::ConsList;
+  /// # use sp_std::iter::FromIterator;
+  /// # fn main() {
+  /// assert_eq!(
+  ///   conslist![2, 8, 1, 6, 3, 7, 5, 4].sort(),
+  ///   ConsList::from_iter(1..9)
+  /// );
+  /// # }
+  /// ```
+  pub fn sort(&self) -> ConsList<A>
+  where A: Ord {
+    self.sort_by(Ord::cmp)
+  }
 }
 
 impl<A> ConsList<A> where A: Ord {}
@@ -518,239 +517,209 @@ impl<A> ConsList<A> where A: Ord {}
 // Core traits
 
 impl<A> Clone for ConsList<A> {
-    /// Clone a list.
-    ///
-    /// Cons cells use `Arc` behind the scenes, so this is no more
-    /// expensive than cloning an `Arc` reference.
-    ///
-    /// Time: O(1)
-    fn clone(&self) -> Self {
-        match *self {
-            ConsList(ref node) => ConsList(node.clone()),
-        }
+  /// Clone a list.
+  ///
+  /// Cons cells use `Arc` behind the scenes, so this is no more
+  /// expensive than cloning an `Arc` reference.
+  ///
+  /// Time: O(1)
+  fn clone(&self) -> Self {
+    match *self {
+      ConsList(ref node) => ConsList(node.clone()),
     }
+  }
 }
 
 impl<A> Default for ConsList<A> {
-    /// `Default` for lists is the empty list.
-    fn default() -> Self {
-        ConsList::new()
-    }
+  /// `Default` for lists is the empty list.
+  fn default() -> Self { ConsList::new() }
 }
 
 #[cfg(not(has_specialisation))]
 impl<A> PartialEq for ConsList<A>
-where
-    A: PartialEq,
+where A: PartialEq
 {
-    /// Test if two lists are equal.
-    ///
-    /// This could potentially be an expensive operation, as we need to walk
-    /// both lists to test for equality. We can very quickly determine equality
-    /// if the lists have different lengths (can't be equal). Otherwise, we walk
-    /// the lists to compare values.
-    ///
-    /// Time: O(n)
-    fn eq(&self, other: &ConsList<A>) -> bool {
-        self.len() == other.len() && self.iter().eq(other.iter())
-    }
+  /// Test if two lists are equal.
+  ///
+  /// This could potentially be an expensive operation, as we need to walk
+  /// both lists to test for equality. We can very quickly determine equality
+  /// if the lists have different lengths (can't be equal). Otherwise, we walk
+  /// the lists to compare values.
+  ///
+  /// Time: O(n)
+  fn eq(&self, other: &ConsList<A>) -> bool {
+    self.len() == other.len() && self.iter().eq(other.iter())
+  }
 }
 
 #[cfg(has_specialisation)]
 impl<A> PartialEq for ConsList<A>
-where
-    A: PartialEq,
+where A: PartialEq
 {
-    /// Test if two lists are equal.
-    ///
-    /// This could potentially be an expensive operation, as we need to walk
-    /// both lists to test for equality. We can very quickly determine equality
-    /// if the lists have different lengths (can't be equal). Otherwise, we walk
-    /// the lists to compare values.
-    ///
-    /// If `A` implements `Eq`, we have an additional shortcut available to us: if
-    /// both lists refer to the same cons cell, as determined by `Arc::ptr_eq`,
-    /// they have to be equal.
-    ///
-    /// Time: O(n)
-    default fn eq(&self, other: &ConsList<A>) -> bool {
-        self.len() == other.len() && self.iter().eq(other.iter())
-    }
+  /// Test if two lists are equal.
+  ///
+  /// This could potentially be an expensive operation, as we need to walk
+  /// both lists to test for equality. We can very quickly determine equality
+  /// if the lists have different lengths (can't be equal). Otherwise, we walk
+  /// the lists to compare values.
+  ///
+  /// If `A` implements `Eq`, we have an additional shortcut available to us: if
+  /// both lists refer to the same cons cell, as determined by `Arc::ptr_eq`,
+  /// they have to be equal.
+  ///
+  /// Time: O(n)
+  default fn eq(&self, other: &ConsList<A>) -> bool {
+    self.len() == other.len() && self.iter().eq(other.iter())
+  }
 }
 
 #[cfg(has_specialisation)]
 impl<A> PartialEq for ConsList<A>
-where
-    A: Eq,
+where A: Eq
 {
-    /// Test if two lists are equal.
-    ///
-    /// This could potentially be an expensive operation, as we need to walk
-    /// both lists to test for equality. We can very quickly determine equality
-    /// if the lists have different lengths (can't be equal). Otherwise, we walk
-    /// the lists to compare values.
-    ///
-    /// If `A` implements `Eq`, we have an additional shortcut available to us: if
-    /// both lists refer to the same cons cell, as determined by `Arc::ptr_eq`,
-    /// they have to be equal.
-    ///
-    /// Time: O(n)
-    fn eq(&self, other: &ConsList<A>) -> bool {
-        Arc::ptr_eq(&self.0, &other.0)
-            || (self.len() == other.len() && self.iter().eq(other.iter()))
-    }
+  /// Test if two lists are equal.
+  ///
+  /// This could potentially be an expensive operation, as we need to walk
+  /// both lists to test for equality. We can very quickly determine equality
+  /// if the lists have different lengths (can't be equal). Otherwise, we walk
+  /// the lists to compare values.
+  ///
+  /// If `A` implements `Eq`, we have an additional shortcut available to us: if
+  /// both lists refer to the same cons cell, as determined by `Arc::ptr_eq`,
+  /// they have to be equal.
+  ///
+  /// Time: O(n)
+  fn eq(&self, other: &ConsList<A>) -> bool {
+    Arc::ptr_eq(&self.0, &other.0)
+      || (self.len() == other.len() && self.iter().eq(other.iter()))
+  }
 }
 
 impl<A> Eq for ConsList<A> where A: Eq {}
 
 impl<A> Hash for ConsList<A>
-where
-    A: Hash,
+where A: Hash
 {
-    fn hash<H>(&self, state: &mut H)
-    where
-        H: Hasher,
-    {
-        for i in self.iter() {
-            i.hash(state);
-        }
+  fn hash<H>(&self, state: &mut H)
+  where H: Hasher {
+    for i in self.iter() {
+      i.hash(state);
     }
+  }
 }
 
 impl<'a, A> Add for &'a ConsList<A> {
-    type Output = ConsList<A>;
+  type Output = ConsList<A>;
 
-    fn add(self, other: Self) -> Self::Output {
-        self.append(other)
-    }
+  fn add(self, other: Self) -> Self::Output { self.append(other) }
 }
 
 impl<A> Add for ConsList<A> {
-    type Output = Self;
+  type Output = Self;
 
-    fn add(self, other: Self) -> Self::Output {
-        self.append(&other)
-    }
+  fn add(self, other: Self) -> Self::Output { self.append(&other) }
 }
 
 impl<A> Debug for ConsList<A>
-where
-    A: Debug,
+where A: Debug
 {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        fn items<A>(l: &ConsList<A>, f: &mut Formatter<'_>) -> Result<(), Error>
-        where
-            A: Debug,
-        {
-            match *l.0 {
-                Nil => Ok(()),
-                Cons(_, ref a, ref d) => {
-                    write!(f, ", {:?}", a)?;
-                    items(d, f)
-                }
-            }
+  fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+    fn items<A>(l: &ConsList<A>, f: &mut Formatter<'_>) -> Result<(), Error>
+    where A: Debug {
+      match *l.0 {
+        Nil => Ok(()),
+        Cons(_, ref a, ref d) => {
+          write!(f, ", {:?}", a)?;
+          items(d, f)
         }
-        write!(f, "[")?;
-        match *self.0 {
-            Nil => Ok(()),
-            Cons(_, ref a, ref d) => {
-                write!(f, "{:?}", a)?;
-                items(d, f)
-            }
-        }?;
-        write!(f, "]")
+      }
     }
+    write!(f, "[")?;
+    match *self.0 {
+      Nil => Ok(()),
+      Cons(_, ref a, ref d) => {
+        write!(f, "{:?}", a)?;
+        items(d, f)
+      }
+    }?;
+    write!(f, "]")
+  }
 }
 
 // Iterators
 
 /// An iterator for ConsList
 pub struct Iter<A> {
-    #[doc(hidden)]
-    current: ConsList<A>,
+  #[doc(hidden)]
+  current: ConsList<A>,
 }
 
 impl<A> Iterator for Iter<A> {
-    type Item = Arc<A>;
+  type Item = Arc<A>;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.current.uncons() {
-            None => None,
-            Some((ref a, ref d)) => {
-                self.current = d.clone();
-                Some(a.clone())
-            }
-        }
+  fn next(&mut self) -> Option<Self::Item> {
+    match self.current.uncons() {
+      None => None,
+      Some((ref a, ref d)) => {
+        self.current = d.clone();
+        Some(a.clone())
+      }
     }
+  }
 
-    fn size_hint(&self) -> (usize, Option<usize>) {
-        let l = self.current.len();
-        (l, Some(l))
-    }
+  fn size_hint(&self) -> (usize, Option<usize>) {
+    let l = self.current.len();
+    (l, Some(l))
+  }
 }
 
 impl<A> ExactSizeIterator for Iter<A> {}
 
 impl<A> IntoIterator for ConsList<A> {
-    type IntoIter = Iter<A>;
-    type Item = Arc<A>;
+  type IntoIter = Iter<A>;
+  type Item = Arc<A>;
 
-    fn into_iter(self) -> Iter<A> {
-        self.iter()
-    }
+  fn into_iter(self) -> Iter<A> { self.iter() }
 }
 
 impl<A> Sum for ConsList<A> {
-    fn sum<I>(it: I) -> Self
-    where
-        I: Iterator<Item = Self>,
-    {
-        it.fold(Self::new(), |a, b| a.append(b))
-    }
+  fn sum<I>(it: I) -> Self
+  where I: Iterator<Item = Self> {
+    it.fold(Self::new(), |a, b| a.append(b))
+  }
 }
 
 impl<A, T> FromIterator<T> for ConsList<A>
-where
-    T: Shared<A>,
+where T: Shared<A>
 {
-    fn from_iter<I>(source: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-    {
-        source
-            .into_iter()
-            .fold(conslist![], |l, v| l.cons(v))
-            .reverse()
-    }
+  fn from_iter<I>(source: I) -> Self
+  where I: IntoIterator<Item = T> {
+    source.into_iter().fold(conslist![], |l, v| l.cons(v)).reverse()
+  }
 }
 
 // Conversions
 
 impl<'a, A, R> From<&'a [R]> for ConsList<A>
-where
-    &'a R: Shared<A>,
+where &'a R: Shared<A>
 {
-    fn from(slice: &'a [R]) -> Self {
-        slice.into_iter().map(|a| a.shared()).collect()
-    }
+  fn from(slice: &'a [R]) -> Self {
+    slice.into_iter().map(|a| a.shared()).collect()
+  }
 }
 
 impl<A, R> From<Vec<R>> for ConsList<A>
-where
-    R: Shared<A>,
+where R: Shared<A>
 {
-    fn from(vec: Vec<R>) -> Self {
-        vec.into_iter().map(|a| a.shared()).collect()
-    }
+  fn from(vec: Vec<R>) -> Self { vec.into_iter().map(|a| a.shared()).collect() }
 }
 
 impl<'a, A, R> From<&'a Vec<R>> for ConsList<A>
-where
-    &'a R: Shared<A>,
+where &'a R: Shared<A>
 {
-    fn from(vec: &'a Vec<R>) -> Self {
-        vec.into_iter().map(|a| a.shared()).collect()
-    }
+  fn from(vec: &'a Vec<R>) -> Self {
+    vec.into_iter().map(|a| a.shared()).collect()
+  }
 }
 
 // QuickCheck
@@ -758,19 +727,20 @@ where
 // #[cfg(any(test))]
 // use arbitrary::{Arbitrary};
 #[cfg(any(test))]
-use quickcheck::{Gen, Arbitrary};
+use quickcheck::{
+  Arbitrary,
+  Gen,
+};
 
 #[cfg(any(test, feature = "quickcheck"))]
 impl<A: Arbitrary + Sync> Arbitrary for ConsList<A> {
-    fn arbitrary(g: &mut Gen) -> Self {
-        ConsList::from(Vec::<A>::arbitrary(g))
-    }
+  fn arbitrary(g: &mut Gen) -> Self { ConsList::from(Vec::<A>::arbitrary(g)) }
 }
 
 // Proptest
 
 //#[cfg(any(test, feature = "proptest"))]
-//pub mod proptest {
+// pub mod proptest {
 //    use super::*;
 //    use ::proptest::strategy::{BoxedStrategy, Strategy, ValueTree};
 //    use sp_std::ops::Range;
@@ -802,71 +772,71 @@ impl<A: Arbitrary + Sync> Arbitrary for ConsList<A> {
 
 #[cfg(test)]
 mod test {
-    // use super::{proptest::*, *};
-    use super::*;
-    use crate::test::is_sorted;
-    // use ::proptest::*;
-    use sp_std::alloc::string::String;
-    use quickcheck::quickcheck;
+  // use super::{proptest::*, *};
+  use super::*;
+  use crate::test::is_sorted;
+  // use ::proptest::*;
+  use quickcheck::quickcheck;
+  use sp_std::alloc::string::String;
 
-    #[test]
-    fn exact_size_iterator() {
-        assert_eq!(10, ConsList::from_iter(1..11).iter().len());
-    }
+  #[test]
+  fn exact_size_iterator() {
+    assert_eq!(10, ConsList::from_iter(1..11).iter().len());
+  }
 
-    #[test]
-    fn collect_from_iterator() {
-        let o: ConsList<i32> = vec![5, 6, 7].iter().cloned().collect();
-        assert_eq!(o, conslist![5, 6, 7]);
-    }
+  #[test]
+  fn collect_from_iterator() {
+    let o: ConsList<i32> = vec![5, 6, 7].iter().cloned().collect();
+    assert_eq!(o, conslist![5, 6, 7]);
+  }
 
-    #[test]
-    fn disequality() {
-        let l = ConsList::from_iter(1..6);
-        assert_ne!(l, cons(0, &l));
-        assert_ne!(l, conslist![1, 2, 3, 4, 5, 6]);
-    }
+  #[test]
+  fn disequality() {
+    let l = ConsList::from_iter(1..6);
+    assert_ne!(l, cons(0, &l));
+    assert_ne!(l, conslist![1, 2, 3, 4, 5, 6]);
+  }
 
-    #[test]
-    fn equality_of_empty_lists() {
-        let l1 = ConsList::<String>::new();
-        let l2 = ConsList::<String>::new();
-        assert_eq!(l1, l2);
-    }
+  #[test]
+  fn equality_of_empty_lists() {
+    let l1 = ConsList::<String>::new();
+    let l2 = ConsList::<String>::new();
+    assert_eq!(l1, l2);
+  }
 
-    quickcheck! {
-        fn length(vec: Vec<i32>) -> bool {
-            let list = ConsList::from(vec.clone());
-            vec.len() == list.len()
-        }
+  quickcheck! {
+      fn length(vec: Vec<i32>) -> bool {
+          let list = ConsList::from(vec.clone());
+          vec.len() == list.len()
+      }
 
-        fn equality(vec: Vec<i32>) -> bool {
-            let list1 = ConsList::from(vec.clone());
-            let list2 = ConsList::from(vec.clone());
-            list1 == list2
-        }
+      fn equality(vec: Vec<i32>) -> bool {
+          let list1 = ConsList::from(vec.clone());
+          let list2 = ConsList::from(vec.clone());
+          list1 == list2
+      }
 
-        fn order(vec: Vec<i32>) -> bool {
-            let list = ConsList::from(vec.clone());
-            list.iter().map(|a| *a).eq(vec.into_iter())
-        }
+      fn order(vec: Vec<i32>) -> bool {
+          let list = ConsList::from(vec.clone());
+          list.iter().map(|a| *a).eq(vec.into_iter())
+      }
 
-        fn reverse_a_list(l: ConsList<i32>) -> bool {
-            let vec: Vec<i32> = l.iter().map(|v| *v).collect();
-            let rev = ConsList::from_iter(vec.into_iter().rev());
-            l.reverse() == rev
-        }
+      fn reverse_a_list(l: ConsList<i32>) -> bool {
+          let vec: Vec<i32> = l.iter().map(|v| *v).collect();
+          let rev = ConsList::from_iter(vec.into_iter().rev());
+          l.reverse() == rev
+      }
 
-        fn append_two_lists(xs: ConsList<i32>, ys: ConsList<i32>) -> bool {
-            let extended = ConsList::from_iter(
-              xs.iter().map(|v| *v).chain(ys.iter().map(|v| *v))
-            );
-            xs.append(&ys) == extended
-        }
+      fn append_two_lists(xs: ConsList<i32>, ys: ConsList<i32>) -> bool {
+          let extended = ConsList::from_iter(
+            xs.iter().map(|v| *v).chain(ys.iter().map(|v| *v))
+          );
+          xs.append(&ys) == extended
+      }
 
-        fn sort_a_list(l: ConsList<i32>) -> bool {
-            let sorted = l.sort();
-            l.len() == sorted.len() && is_sorted(sorted)
-        }
-    }
+      fn sort_a_list(l: ConsList<i32>) -> bool {
+          let sorted = l.sort();
+          l.len() == sorted.len() && is_sorted(sorted)
+      }
+  }
 }

@@ -1,19 +1,19 @@
 [package]
 name = "sp-im"
-version = "0.0.1"
+version = "0.1.0"
+edition = "2018"
 authors = [
 	"John Burnham <john@yatima.io>",
-	"Bodil Stokke <bodil@bodil.org>",
 	"Anders C. Sørby <anders@yatima.io>",
 	"Samuel Burnham <sam@yatima.io>",
 ]
-edition = "2018"
 license = "MIT"
-description = "Immutable collection datatypes"
+readme = "README.md"
 repository = "https://github.com/yatima-inc/sp-im"
-readme = "./README.md"
-categories = ["data-structures"]
-keywords = ["immutable", "persistent", "no_std", "b-tree", "rrb-tree"]
+documentation = "https://docs.rs/sp-im"
+description = "Immutable datatypes for no_std use within Substrate"
+categories = ["data-structures", "no_std"]
+keywords = ["immutable", "persistent", "no-std", "b-tree", "rrb-tree"]
 
 [package.metadata.docs.rs]
 all-features = true
@@ -31,8 +31,7 @@ debug = []
 [dependencies]
 typenum = "1.12"
 bitmaps = { version = "3", default-features = false }
-sized-chunks = { git = "https://github.com/yatima-inc/sized-chunks", branch = "main", default-features = false }
-#sized-chunks = { version = "0.6", default-features = false }
+sized-chunks = { version = "0.6.5", default-features = false }
 rand_core = { version = "0.5.1", default-features = false }
 rand_xoshiro = "0.4"
 serde = { version="1", optional=true }
