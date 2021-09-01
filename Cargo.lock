@@ -58,15 +58,6 @@ checksum = "2da1976d75adbe5fbc88130ecd119529cf1cc6a93ae1546d8696ee66f0d21af1"
 
 [[package]]
 name = "bitmaps"
-version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "031043d04099746d8db04daf1fa424b2bc8bd69d92b25962dcde24da39ab64a2"
-dependencies = [
- "typenum",
-]
-
-[[package]]
-name = "bitmaps"
 version = "3.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "303cec55cd9c5fde944b061b902f142b52a8bb5438cc822481ea1e3ebc96bbcb"
@@ -522,11 +513,9 @@ dependencies = [
 [[package]]
 name = "sized-chunks"
 version = "0.6.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16d69225bde7a69b235da73377861095455d298f2b970996eec25ddbb42b3d1e"
+source = "git+https://github.com/yatima-inc/sized-chunks?branch=master#ba09facdef63f6150499e7fc7d6a49fba6da3dd5"
 dependencies = [
- "bitmaps 2.1.0",
- "typenum",
+ "bitmaps",
 ]
 
 [[package]]
@@ -534,7 +523,7 @@ name = "sp-im"
 version = "0.1.0"
 dependencies = [
  "arbitrary",
- "bitmaps 3.1.0",
+ "bitmaps",
  "metrohash",
  "pretty_assertions",
  "proptest",
