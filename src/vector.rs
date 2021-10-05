@@ -76,7 +76,7 @@ use sp_std::{
   vec::Vec,
 };
 
-use sized_chunks::InlineArray;
+use sp_sized_chunks::InlineArray;
 
 use crate::{
   nodes::{

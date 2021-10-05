@@ -14,14 +14,10 @@ use sp_std::{
   vec::Vec,
 };
 
-use sized_chunks::Chunk;
-use typenum::{
-  Add1,
-  Unsigned,
-};
+use sp_sized_chunks::Chunk;
 
 use crate::{
-  config::OrdChunkSize as NodeSize,
+  config::ORD_CHUNK_SIZE,
   util::{
     Pool,
     PoolClone,
@@ -35,7 +31,7 @@ use self::{
   InsertAction::*,
 };
 
-const NODE_SIZE: usize = NodeSize::USIZE;
+const NODE_SIZE: usize = ORD_CHUNK_SIZE;
 const MEDIAN: usize = (NODE_SIZE + 1) >> 1;
 
 pub trait BTreeValue {
@@ -56,8 +52,8 @@ pub trait BTreeValue {
 }
 
 pub(crate) struct Node<A> {
-  keys: Chunk<A, NodeSize>,
-  children: Chunk<Option<PoolRef<Node<A>>>, Add1<NodeSize>>,
+  keys: Chunk<A, 64>,
+  children: Chunk<Option<PoolRef<Node<A>>>, 65>,
 }
 
 #[cfg(feature = "pool")]
