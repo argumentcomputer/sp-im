@@ -12,7 +12,7 @@ readme = "README.md"
 repository = "https://github.com/yatima-inc/sp-im"
 documentation = "https://docs.rs/sp-im"
 description = "Immutable datatypes for no_std use within Substrate"
-categories = ["data-structures", "no_std"]
+categories = ["data-structures", "no-std"]
 keywords = ["immutable", "persistent", "no-std", "b-tree", "rrb-tree"]
 
 [package.metadata.docs.rs]
