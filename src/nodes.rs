@@ -7,7 +7,7 @@ pub(crate) mod rrb;
 
 pub(crate) mod chunk {
   use crate::config::VECTOR_CHUNK_SIZE;
-  use sized_chunks as sc;
+  use sp_sized_chunks as sc;
 
   pub(crate) type Chunk<A> = sc::sized_chunk::Chunk<A, VECTOR_CHUNK_SIZE>;
   pub(crate) const CHUNK_SIZE: usize = VECTOR_CHUNK_SIZE;

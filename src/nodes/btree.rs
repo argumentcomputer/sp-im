@@ -14,7 +14,7 @@ use sp_std::{
   vec::Vec,
 };
 
-use sized_chunks::Chunk;
+use sp_sized_chunks::Chunk;
 
 use crate::{
   config::ORD_CHUNK_SIZE,
