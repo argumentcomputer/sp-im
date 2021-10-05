@@ -31,7 +31,7 @@ debug = []
 [dependencies]
 typenum = "1.2"
 bitmaps = { version = "3.1.0", default-features = false }
-sized-chunks = { git = "https://github.com/yatima-inc/sized-chunks", branch = "master", default-features = false }
+sp-sized-chunks = { version = "0.1.0", default-features = false }
 rand_core = { version = "0.5.1", default-features = false }
 rand_xoshiro = "0.4"
 serde = { version="1", optional=true }
