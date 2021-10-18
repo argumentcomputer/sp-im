@@ -335,6 +335,9 @@
 #![cfg_attr(has_specialisation, feature(specialization))]
 #![cfg_attr(not(any(feature = "std", test)), no_std)]
 
+#[macro_use]
+extern crate alloc;
+
 #[cfg(test)]
 #[macro_use]
 extern crate pretty_assertions;

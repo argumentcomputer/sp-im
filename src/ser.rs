@@ -17,11 +17,12 @@ use serde::{
     Serializer,
   },
 };
-use sp_std::{
-  fmt,
+use core::{
   marker::PhantomData,
   ops::Deref,
 };
+
+use core::fmt;
 
 use crate::{
   ordmap::OrdMap,

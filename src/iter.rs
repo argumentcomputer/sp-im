@@ -17,7 +17,7 @@
 /// # #[macro_use] extern crate sp_im;
 /// # use sp_im::iter::unfold;
 /// # use sp_im::vector::Vector;
-/// # use sp_std::iter::FromIterator;
+/// # use core::iter::FromIterator;
 /// // Create an infinite stream of numbers, starting at 0.
 /// let mut it = unfold(0, |i| Some((i, i + 1)));
 ///
@@ -31,7 +31,7 @@
 pub fn unfold<F, S, A>(value: S, f: F) -> impl Iterator<Item = A>
 where F: Fn(S) -> Option<(A, S)> {
   let mut value = Some(value);
-  sp_std::iter::from_fn(move || {
+  core::iter::from_fn(move || {
     f(value.take().unwrap()).map(|(next, state)| {
       value = Some(state);
       next

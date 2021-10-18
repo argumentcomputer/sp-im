@@ -5,7 +5,7 @@
 pub(crate) use self::lock::Lock;
 
 mod lock {
-  use sp_std::sync::Arc;
+  use alloc::sync::Arc;
   use spin::mutex::{
     Mutex,
     MutexGuard,

@@ -4,7 +4,7 @@
 
 // Every codebase needs a `util` module.
 
-use sp_std::{
+use core::{
   cmp::Ordering,
   ops::{
     Bound,
@@ -53,7 +53,7 @@ pub(crate) type Pool<A> = refpool::Pool<A>;
 
 // `Ref` == `Rc` when not threadsafe
 #[cfg(not(threadsafe))]
-pub(crate) type Ref<A> = sp_std::rc::Rc<A>;
+pub(crate) type Ref<A> = alloc::rc::Rc<A>;
 
 pub(crate) fn clone_ref<A>(r: Ref<A>) -> A
 where A: Clone {

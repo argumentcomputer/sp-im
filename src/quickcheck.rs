@@ -9,7 +9,7 @@ use ::quickcheck::{
   Arbitrary,
   Gen,
 };
-use sp_std::{
+use core::{
   hash::{
     BuildHasher,
     Hash,
