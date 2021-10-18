@@ -4,9 +4,12 @@
 
 #![allow(dead_code)]
 
-use sp_std::{
+use core::{
   marker::PhantomData,
   ops::Deref,
+};
+
+use alloc::{
   rc::Rc as RRc,
   sync::Arc as RArc,
 };
@@ -92,14 +95,14 @@ where A: PartialEq
 
 impl<A> Eq for Rc<A> where A: Eq {}
 
-impl<A> sp_std::fmt::Debug for Rc<A>
-where A: sp_std::fmt::Debug
+impl<A> core::fmt::Debug for Rc<A>
+where A: core::fmt::Debug
 {
   #[inline(always)]
   fn fmt(
     &self,
-    f: &mut sp_std::fmt::Formatter<'_>,
-  ) -> Result<(), sp_std::fmt::Error> {
+    f: &mut core::fmt::Formatter<'_>,
+  ) -> Result<(), core::fmt::Error> {
     self.0.fmt(f)
   }
 }
@@ -165,14 +168,14 @@ where A: PartialEq
 
 impl<A> Eq for Arc<A> where A: Eq {}
 
-impl<A> sp_std::fmt::Debug for Arc<A>
-where A: sp_std::fmt::Debug
+impl<A> core::fmt::Debug for Arc<A>
+where A: core::fmt::Debug
 {
   #[inline(always)]
   fn fmt(
     &self,
-    f: &mut sp_std::fmt::Formatter<'_>,
-  ) -> Result<(), sp_std::fmt::Error> {
+    f: &mut core::fmt::Formatter<'_>,
+  ) -> Result<(), core::fmt::Error> {
     self.0.fmt(f)
   }
 }

@@ -7,7 +7,7 @@ use rand_core::{
   RngCore,
   SeedableRng,
 };
-use sp_std::{
+use core::{
   cmp::Ordering,
   mem,
 };

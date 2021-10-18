@@ -19,14 +19,19 @@
 //! Otherwise, operations are generally O(n).
 
 use crate::shared::Shared;
-use sp_std::{
+use alloc::{
   borrow::Borrow,
-  cmp::Ordering,
   fmt::{
     Debug,
     Error,
     Formatter,
   },
+  sync::Arc,
+  vec::Vec,
+};
+
+use core::{
+  cmp::Ordering,
   hash::{
     Hash,
     Hasher,
@@ -40,8 +45,6 @@ use sp_std::{
     Add,
     Deref,
   },
-  sync::Arc,
-  vec::Vec,
 };
 
 use self::ConsListNode::{
@@ -498,7 +501,7 @@ impl<A> ConsList<A> {
   /// ```
   /// # #[macro_use] extern crate sp_im;
   /// # use sp_im::conslist::ConsList;
-  /// # use sp_std::iter::FromIterator;
+  /// # use core::iter::FromIterator;
   /// # fn main() {
   /// assert_eq!(
   ///   conslist![2, 8, 1, 6, 3, 7, 5, 4].sort(),
@@ -743,7 +746,7 @@ impl<A: Arbitrary + Sync> Arbitrary for ConsList<A> {
 // pub mod proptest {
 //    use super::*;
 //    use ::proptest::strategy::{BoxedStrategy, Strategy, ValueTree};
-//    use sp_std::ops::Range;
+//    use core::ops::Range;
 
 //    /// A strategy for a cons list of a given size.
 //    ///
@@ -777,7 +780,7 @@ mod test {
   use crate::test::is_sorted;
   // use ::proptest::*;
   use quickcheck::quickcheck;
-  use sp_std::alloc::string::String;
+  use alloc::string::String;
 
   #[test]
   fn exact_size_iterator() {

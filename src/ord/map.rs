@@ -16,12 +16,11 @@
 //! [1]: https://en.wikipedia.org/wiki/B-tree
 //! [std::cmp::Ord]: https://doc.rust-lang.org/std/cmp/trait.Ord.html
 
-use sp_std::{
+use alloc::{
   borrow::{
     Borrow,
     ToOwned,
   },
-  cmp::Ordering,
   collections::btree_map::{
     self,
     BTreeMap,
@@ -31,6 +30,11 @@ use sp_std::{
     Error,
     Formatter,
   },
+  vec::Vec,
+};
+
+use core::{
+  cmp::Ordering,
   hash::{
     Hash,
     Hasher,
@@ -47,8 +51,8 @@ use sp_std::{
     IndexMut,
     RangeBounds,
   },
-  vec::Vec,
 };
+  
 
 #[cfg(has_specialisation)]
 use crate::util::linear_search_by;
@@ -253,7 +257,7 @@ impl<K, V> OrdMap<K, V> {
   ///
   /// Time: O(1)
   pub fn ptr_eq(&self, other: &Self) -> bool {
-    sp_std::ptr::eq(self, other) || PoolRef::ptr_eq(&self.root, &other.root)
+    core::ptr::eq(self, other) || PoolRef::ptr_eq(&self.root, &other.root)
   }
 
   /// Get the size of a map.

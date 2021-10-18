@@ -3,7 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // use metrohash::MetroHash64;
-use sp_std::{
+use core::{
   hash::Hasher,
   marker::PhantomData,
 };

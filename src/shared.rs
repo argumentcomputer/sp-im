@@ -6,22 +6,22 @@
 
 //! Automatic `Arc` wrapping.
 
-use sp_std::sync::Arc;
+use alloc::sync::Arc;
 
 /// # Automatic `Arc` wrapping
 ///
 /// The `Shared` trait provides automatic wrapping for things which
-/// take [`Arc`][sp_std::sync::Arc]s, meaning that anything which takes
+/// take [`Arc`][alloc::sync::Arc]s, meaning that anything which takes
 /// an argument of type `Shared<A>` will accept either an `A` or an
 /// `Arc<A>`.
 ///
 /// Because everything stored in `im`'s persistent data structures is
-/// wrapped in [`Arc`][sp_std::sync::Arc]s, `Shared` makes you have to
+/// wrapped in [`Arc`][alloc::sync::Arc]s, `Shared` makes you have to
 /// worry less about whether what you've got is an `A` or an `Arc<A>`
 /// or a reference to such - the compiler will just figure it out for
 /// you, which is as it should be.
 ///
-/// [sp_std::sync::Arc]: https://docs.rs/sp-std/3.0.0/sp_std/sync/struct.Arc.html
+/// [alloc::sync::Arc]: https://doc.rust-lang.org/alloc/sync/struct.Arc.html
 pub trait Shared<A> {
   /// Get a new Arc pointer for this value
   fn shared(self) -> Arc<A>;
